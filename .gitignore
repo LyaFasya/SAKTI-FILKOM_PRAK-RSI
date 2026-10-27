@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+private-files/
+private-exports/
+
+.DS_Store
+*.log
