@@ -1,23 +1,32 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import PageHeader from "../../components/PageHeader.jsx";
-import StatusBadge from "../../components/StatusBadge.jsx";
+import TabelPengajuan from "../../components/staf/TabelPengajuan.jsx";
 import { DAFTAR_STATUS } from "../../config/constants.js";
 import useAmbilData from "../../hooks/useAmbilData.js";
-import { ambilDaftarPengajuan } from "../../services/pengajuanService.js";
+import { ambilDaftarPengajuan, ambilOpsiLayanan } from "../../services/pengajuanService.js";
+import "./pengajuan.css";
 
 // DSB-UI02 | DSB-UC02 Melihat Daftar Pengajuan, DSB-UC03 Mencari dan Memfilter
 // DSB-UI03 (tidak ditemukan) tampil sebagai kondisi kosong di bawah.
-// STARTER: filter disimpan di URL (?status=...&q=...) sehingga link dari Dashboard
-// langsung membuka daftar yang sudah terfilter.
+// Sumber desain: Figma "Daftar Pengajuan".
+// Filter disimpan di URL (?q=...&status=...&layanan=...), jadi bisa di-bookmark
+// dan tombol Back di browser tetap masuk akal.
 export default function DaftarPengajuanPage() {
   const [params, setParams] = useSearchParams();
-  const status = params.get("status") ?? "";
   const kataKunci = params.get("q") ?? "";
+  const status = params.get("status") ?? "";
+  const idLayanan = params.get("layanan") ?? "";
 
-  const { data, memuat, error } = useAmbilData(
-    () => ambilDaftarPengajuan({ status, kataKunci }),
-    [status, kataKunci]
+  // Teks di kolom cari baru dipakai saat tombol "Cari" ditekan (atau Enter).
+  const [kataKunciInput, setKataKunciInput] = useState(kataKunci);
+  useEffect(() => setKataKunciInput(kataKunci), [kataKunci]);
+
+  const opsiLayanan = useAmbilData(() => ambilOpsiLayanan(), []);
+  const daftar = useAmbilData(
+    () => ambilDaftarPengajuan({ kataKunci, status, idLayanan }),
+    [kataKunci, status, idLayanan]
   );
 
   function ubahFilter(nama, nilai) {
@@ -27,57 +36,67 @@ export default function DaftarPengajuanPage() {
     setParams(baru, { replace: true });
   }
 
+  function cari(event) {
+    event.preventDefault();
+    ubahFilter("q", kataKunciInput.trim());
+  }
+
+  function reset() {
+    setKataKunciInput("");
+    setParams({}, { replace: true });
+  }
+
+  const hasil = daftar.data ?? [];
+  const layanan = opsiLayanan.data ?? [];
+
   return (
     <>
-      <PageHeader judul="Daftar pengajuan" deskripsi="Pengajuan layanan dari mahasiswa." />
+      <PageHeader
+        judul="Daftar pengajuan"
+        deskripsi="Pengajuan layanan mahasiswa yang tersimpan pada sistem."
+      />
 
-      <div className="toolbar">
-        <input
-          type="search"
-          placeholder="Cari nama, NIM, atau ID pengajuan"
-          value={kataKunci}
-          onChange={(e) => ubahFilter("q", e.target.value)}
-          aria-label="Cari pengajuan"
-        />
-        <select value={status} onChange={(e) => ubahFilter("status", e.target.value)} aria-label="Filter status">
-          <option value="">Semua status</option>
-          {DAFTAR_STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-      </div>
+      <section className="staf-panel" aria-label="Daftar pengajuan">
+        <form className="daftar-filter" onSubmit={cari}>
+          <div className="daftar-filter__cari">
+            <input
+              type="search"
+              placeholder="Cari ID, nama, NIM, atau layanan"
+              aria-label="Cari pengajuan"
+              value={kataKunciInput}
+              onChange={(e) => setKataKunciInput(e.target.value)}
+            />
+          </div>
 
-      {error && <p className="pesan pesan--error" role="alert">{error}</p>}
-      {memuat && <p className="teks-redup">Memuat data...</p>}
+          <select
+            aria-label="Filter status"
+            value={status}
+            onChange={(e) => ubahFilter("status", e.target.value)}
+          >
+            <option value="">Semua</option>
+            {DAFTAR_STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
 
-      {data && data.length === 0 && (
-        <div className="kartu">
-          <strong>Pengajuan tidak ditemukan</strong>
-          <p className="teks-redup">Ubah kata kunci atau filter, lalu coba lagi.</p>
-        </div>
-      )}
+          <select
+            aria-label="Filter jenis layanan"
+            value={idLayanan}
+            onChange={(e) => ubahFilter("layanan", e.target.value)}
+          >
+            <option value="">Semua layanan</option>
+            {layanan.map((l) => (
+              <option key={l.idLayanan} value={l.idLayanan}>{l.namaLayanan}</option>
+            ))}
+          </select>
 
-      {data && data.length > 0 && (
-        <div className="tabel-bungkus">
-          <table className="tabel">
-            <thead>
-              <tr>
-                <th>ID</th><th>Mahasiswa</th><th>NIM</th><th>Layanan</th><th>Tanggal</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((p) => (
-                <tr key={p.idPengajuan}>
-                  <td><Link to={`/staf/pengajuan/${p.idPengajuan}`}>{p.idPengajuan}</Link></td>
-                  <td>{p.namaMahasiswa}</td>
-                  <td>{p.nim}</td>
-                  <td>{p.namaLayanan}</td>
-                  <td>{p.tanggalPengajuan}</td>
-                  <td><StatusBadge status={p.statusPengajuan} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+          <button type="submit" className="tombol">Cari</button>
+          <button type="button" className="tombol tombol--garis" onClick={reset}>Reset</button>
+        </form>
+
+        {daftar.error && <p className="pesan pesan--error" role="alert">{daftar.error}</p>}
+        {daftar.data === null && daftar.memuat && <p className="teks-redup">Memuat data...</p>}
+
+        {daftar.data && <TabelPengajuan daftar={hasil} />}
+      </section>
     </>
   );
 }

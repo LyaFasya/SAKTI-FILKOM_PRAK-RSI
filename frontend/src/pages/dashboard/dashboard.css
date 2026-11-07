@@ -1,0 +1,55 @@
+/* Gaya khusus halaman Ringkasan Pengajuan (DSB-UI01). Milik NC. */
+
+.dash-hero {
+  position: relative; overflow: hidden; margin-bottom: 20px;
+  padding: 34px 32px; border: 1px solid #dbe6f6; border-radius: 24px;
+  background: linear-gradient(120deg, #e1eaf5 0%, #edf3fb 55%, #f4f8fd 100%);
+  box-shadow: 0 10px 30px rgba(51, 77, 175, 0.08);
+}
+.dash-hero::before, .dash-hero::after {
+  content: ""; position: absolute; border-radius: 50%;
+  border: 1px solid rgba(112, 150, 209, 0.25); pointer-events: none;
+}
+.dash-hero::before { width: 360px; height: 360px; right: -90px; top: -190px; background: rgba(112, 150, 209, 0.12); }
+.dash-hero::after { width: 260px; height: 260px; right: -20px; top: -150px; }
+.dash-hero > * { position: relative; }
+.dash-hero .dash-eyebrow { margin: 0 0 14px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--s-blue-600); }
+.dash-hero h1 { margin: 0 0 8px; font-size: 1.9rem; font-weight: 800; line-height: 1.2; color: var(--s-navy-800); }
+.dash-hero p { margin: 0; font-size: 0.9rem; color: var(--s-redup); }
+
+/* Empat kartu status */
+.dash-stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 22px; }
+.dash-stat__kartu {
+  padding: 22px 22px 20px; border: 1px solid var(--s-garis); border-top: 4px solid var(--s-blue-600);
+  border-radius: 18px; background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 28px rgba(51, 77, 175, 0.08);
+}
+.dash-stat__angka { margin: 22px 0 2px; font-size: 2.1rem; font-weight: 700; line-height: 1.1; color: var(--s-navy-800); }
+.dash-stat__ket { font-size: 0.75rem; color: var(--s-redup); }
+
+/* Pencarian dan filter */
+.dash-field label { display: block; margin-bottom: 8px; font-size: 0.78rem; font-weight: 600; }
+.dash-cari { display: flex; gap: 12px; margin-bottom: 20px; }
+.dash-cari__kolom { flex: 1; min-width: 0; }
+.dash-cari__kolom input { width: 100%; padding: 13px 16px; font-size: 0.85rem; }
+.dash-cari__aksi { display: flex; align-items: flex-end; gap: 10px; }
+.dash-cari__aksi .tombol { padding: 13px 22px; font-size: 0.85rem; }
+.dash-filter { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 26px; }
+.dash-filter select { width: 100%; padding: 13px 16px; font-size: 0.85rem; }
+
+/* Bar jumlah per layanan */
+/* Dua kolom yang terisi dari atas ke bawah: kolom kiri penuh dulu, lalu kolom kanan. */
+.dash-bar { column-count: 2; column-gap: 32px; }
+.dash-bar > div { break-inside: avoid; margin-bottom: 22px; }
+.dash-bar__kosong { margin: 0; padding: 52px 0 44px; text-align: center; font-size: 0.85rem; color: var(--s-redup); }
+.dash-bar__baris { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 0.75rem; }
+.dash-bar__jumlah { font-weight: 600; }
+.dash-bar__jalur { height: 6px; border-radius: 999px; background: var(--s-latar-lembut); overflow: hidden; }
+.dash-bar__isi { height: 100%; border-radius: 999px; background: var(--s-blue-600); }
+
+@media (max-width: 700px) {
+  .dash-cari { flex-direction: column; }
+  .dash-filter { grid-template-columns: 1fr; }
+  .dash-bar { column-count: 1; }
+  .dash-hero h1 { font-size: 1.5rem; }
+}

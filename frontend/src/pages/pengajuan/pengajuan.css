@@ -1,0 +1,7 @@
+/* Gaya khusus halaman Daftar Pengajuan (DSB-UI02/03). Milik NC. */
+
+.daftar-filter { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; }
+.daftar-filter__cari { flex: 1 1 260px; min-width: 0; }
+.daftar-filter__cari input { width: 100%; padding: 13px 16px; font-size: 0.85rem; }
+.daftar-filter select { flex: 0 0 auto; width: 224px; min-width: 0; max-width: 100%; padding: 13px 16px; font-size: 0.85rem; }
+.daftar-filter .tombol { padding: 13px 22px; font-size: 0.85rem; }

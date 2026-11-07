@@ -1,0 +1,200 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+/* ==========================================================
+   TEMA AREA STAF (milik NC). Semua aturan dibatasi di dalam .staf-app,
+   jadi tidak mengubah tampilan halaman mahasiswa (AK dan DK).
+   Warna diambil dari palet Figma "Dashboard Staf KMA".
+   CATATAN: font Plus Jakarta Sans adalah tebakan dari tampilan desain,
+   cek di Figma (pilih teks, lihat panel Typography) dan ganti kalau beda.
+   ========================================================== */
+.staf-app {
+  --s-navy-900: #091f5c;
+  --s-navy-800: #102552;
+  --s-blue-600: #334daf;
+  --s-blue-500: #405fb4;
+  --s-teks: #102552;
+  --s-redup: #6d82a3;
+  --s-garis: #d5e2f2;
+  --s-latar: #f9fbff;
+  --s-latar-lembut: #edf3fa;
+  --s-permukaan: #ffffff;
+
+  --s-menunggu-bg: #fff7df;
+  --s-menunggu-garis: #f0dfaa;
+  --s-menunggu-teks: #9e7527;
+  --s-diproses-bg: #e6edfc;
+  --s-diproses-garis: #b7c8e3;
+  --s-diproses-teks: #334daf;
+  --s-disetujui-bg: #eaf8f1;
+  --s-disetujui-garis: #cde8dd;
+  --s-disetujui-teks: #358467;
+  --s-ditolak-bg: #fff0f3;
+  --s-ditolak-garis: #f1d4dc;
+  --s-ditolak-teks: #b45364;
+
+  --s-lebar-sidebar: 248px;
+
+  display: grid;
+  grid-template-columns: var(--s-lebar-sidebar) minmax(0, 1fr);
+  min-height: 100vh;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--s-teks);
+  background: linear-gradient(180deg, var(--s-latar) 0%, var(--s-latar-lembut) 100%);
+}
+
+/* ---------- Sidebar ---------- */
+.staf-sidebar {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 28px 20px 24px;
+  color: #fff;
+  background: linear-gradient(180deg, #091f5c 0%, #0f2f84 100%);
+}
+.staf-merek { display: flex; align-items: center; gap: 12px; }
+.staf-merek__logo {
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: 12px; background: #fff; color: var(--s-navy-900);
+}
+.staf-merek__nama { font-weight: 800; font-size: 1.05rem; letter-spacing: -0.01em; }
+.staf-sidebar__label {
+  margin: 10px 0 36px; font-size: 0.68rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #8fa3d6;
+}
+.staf-nav { display: flex; flex-direction: column; gap: 6px; }
+.staf-nav__link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border: 1px solid transparent; border-radius: 12px;
+  font-size: 0.88rem; font-weight: 500; color: #c3d0f0; text-decoration: none;
+}
+.staf-nav__link:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.staf-nav__link--aktif {
+  color: #fff; font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.staf-sidebar__bawah { display: flex; flex-direction: column; gap: 18px; }
+.staf-sidebar__instansi { font-size: 0.72rem; color: #8fa3d6; line-height: 1.5; }
+.staf-keluar {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 10px; font: inherit; font-weight: 600; color: #fff;
+  background: transparent; border: 0; border-radius: 12px; cursor: pointer;
+}
+.staf-keluar:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* ---------- Area utama ---------- */
+.staf-utama { display: flex; flex-direction: column; min-width: 0; }
+
+.staf-topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 22px 36px;
+  background: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid var(--s-garis);
+}
+.staf-topbar__judul { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; color: var(--s-blue-600); }
+.staf-topbar__sub { font-size: 0.78rem; color: var(--s-redup); }
+.staf-profil { display: flex; align-items: center; gap: 12px; }
+.staf-profil__avatar {
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: 50%; font-size: 0.8rem; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #405fb4, #334daf);
+  box-shadow: 0 4px 10px rgba(51, 77, 175, 0.3);
+}
+.staf-profil__nama { font-size: 0.82rem; font-weight: 700; }
+.staf-profil__peran { font-size: 0.72rem; color: var(--s-redup); }
+
+.staf-konten { flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 28px 36px 40px; }
+.staf-breadcrumb { margin-bottom: 20px; font-size: 0.75rem; color: var(--s-redup); }
+.staf-breadcrumb a { color: inherit; text-decoration: none; }
+.staf-breadcrumb a:hover { text-decoration: underline; }
+
+.staf-footer {
+  display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+  padding: 22px 16px 28px; font-size: 0.72rem; color: var(--s-redup);
+}
+.staf-footer__resmi { font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.staf-footer__logo { display: block; height: 26px; width: auto; }
+.staf-footer__garis { width: 1px; height: 22px; background: var(--s-garis); }
+
+/* ---------- Penyesuaian komponen bersama di dalam area staf ---------- */
+:where(.staf-app) h1 { letter-spacing: -0.02em; }
+
+/* Judul halaman (dipakai PageHeader di semua halaman staf) */
+.staf-app .page-header { margin-bottom: 24px; }
+.staf-app .page-header h1 { margin: 0 0 6px; font-size: 2rem; font-weight: 800; line-height: 1.2; color: var(--s-navy-800); }
+.staf-app .page-header p { margin: 0; font-size: 0.82rem; }
+.staf-app .kartu {
+  border-color: var(--s-garis); border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(51, 77, 175, 0.07);
+}
+.staf-app .teks-redup { color: var(--s-redup); }
+.staf-app .tombol { background: var(--s-blue-600); border-color: var(--s-blue-600); border-radius: 12px; }
+.staf-app .tombol:hover { background: var(--s-navy-900); }
+.staf-app .tombol--bahaya { background: var(--s-ditolak-teks); border-color: var(--s-ditolak-teks); }
+.staf-app .tombol--bahaya:hover { background: #9c4254; border-color: #9c4254; }
+.staf-app .tombol--ikon { display: inline-flex; align-items: center; gap: 10px; }
+.staf-app .tombol[aria-disabled="true"], .staf-app .tombol:disabled { opacity: 0.55; cursor: not-allowed; }
+.staf-app .tombol--garis { color: var(--s-teks); background: #fff; border-color: var(--s-garis); }
+.staf-app .tombol--garis:hover { background: var(--s-latar-lembut); }
+.staf-app input, .staf-app select, .staf-app textarea {
+  font-family: inherit; color: var(--s-teks);
+  border-color: #cfdcf0; border-radius: 12px;
+  box-shadow: 0 0 0 3px rgba(112, 150, 209, 0.1);
+}
+.staf-app input:focus-visible, .staf-app select:focus-visible { box-shadow: 0 0 0 3px rgba(51, 77, 175, 0.25); }
+:where(.staf-app) a { color: var(--s-blue-600); }
+.staf-app .tabel-bungkus { border-color: var(--s-garis); border-radius: 16px; }
+.staf-app .tabel th { background: var(--s-latar-lembut); color: var(--s-redup); }
+.staf-app .tabel th, .staf-app .tabel td { border-bottom-color: var(--s-garis); }
+
+/* Lencana status memakai warna Figma */
+.staf-app .badge { padding: 4px 12px; border: 1px solid transparent; font-size: 0.75rem; white-space: nowrap; }
+.staf-app .badge--menunggu { background: var(--s-menunggu-bg); border-color: var(--s-menunggu-garis); color: var(--s-menunggu-teks); }
+.staf-app .badge--diproses { background: var(--s-diproses-bg); border-color: var(--s-diproses-garis); color: var(--s-diproses-teks); }
+.staf-app .badge--disetujui { background: var(--s-disetujui-bg); border-color: var(--s-disetujui-garis); color: var(--s-disetujui-teks); }
+.staf-app .badge--ditolak { background: var(--s-ditolak-bg); border-color: var(--s-ditolak-garis); color: var(--s-ditolak-teks); }
+
+/* ---------- Komponen staf yang dipakai bersama beberapa halaman ---------- */
+.staf-panel {
+  margin-bottom: 22px; padding: 26px 26px 28px;
+  border: 1px solid var(--s-garis); border-radius: 22px; background: #fff;
+  box-shadow: 0 10px 30px rgba(51, 77, 175, 0.07);
+}
+.staf-panel__kepala { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.staf-panel__kepala h2 { margin: 0; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--s-navy-800); }
+.staf-pill {
+  padding: 5px 12px; border: 1px solid var(--s-garis); border-radius: 999px;
+  font-size: 0.72rem; font-weight: 600; color: var(--s-redup); background: var(--s-latar-lembut);
+}
+.staf-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: var(--s-blue-600); text-decoration: none; }
+.staf-link:hover { text-decoration: underline; }
+.staf-kosong { padding: 36px 16px; text-align: center; }
+.staf-kosong strong { display: block; margin-bottom: 4px; }
+
+.staf-tabel-bungkus { overflow-x: auto; border: 1px solid var(--s-garis); border-radius: 16px; }
+.staf-tabel { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.staf-tabel th {
+  padding: 14px 16px; text-align: left; white-space: nowrap;
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--s-redup); background: var(--s-latar-lembut);
+}
+.staf-tabel td { padding: 18px 16px; vertical-align: middle; border-top: 1px solid var(--s-garis); }
+.staf-tabel tbody tr:first-child td { border-top: 0; }
+.staf-tabel td:nth-child(4), .staf-tabel td:nth-child(6) { white-space: nowrap; }
+.staf-tabel__kosong {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 52px 16px 58px; text-align: center; border-top: 1px solid var(--s-garis);
+}
+.staf-tabel__kosong strong { font-size: 0.95rem; color: var(--s-navy-800); }
+.staf-tabel__kosong span { font-size: 0.85rem; color: var(--s-redup); }
+.staf-tabel__id { font-weight: 600; white-space: nowrap; }
+.staf-tabel__nama { font-weight: 600; white-space: nowrap; }
+.staf-tabel__nim { margin-top: 2px; font-size: 0.68rem; color: var(--s-redup); }
+
+/* ---------- Layar kecil ---------- */
+@media (max-width: 900px) {
+  .staf-app { grid-template-columns: 1fr; }
+  .staf-sidebar { position: static; height: auto; gap: 20px; }
+  .staf-sidebar__label { margin-bottom: 16px; }
+  .staf-nav { flex-direction: row; flex-wrap: wrap; }
+  .staf-topbar, .staf-konten { padding-left: 18px; padding-right: 18px; }
+}
