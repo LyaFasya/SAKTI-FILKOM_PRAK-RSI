@@ -81,6 +81,12 @@ CREATE TABLE DokumenPersyaratan (
     idLayanan INT NOT NULL,
     namaDokumen VARCHAR(150) NOT NULL,
     wajib BOOLEAN NOT NULL DEFAULT TRUE,
+    petunjukUnggahan TEXT NULL,
+    kelompokFormulir VARCHAR(150) NULL,
+    format VARCHAR(100) NULL,
+    maksimalFile INT NULL,
+    maksimalUkuranMb INT NULL,
+    ketentuanUnggahan VARCHAR(255) NULL,
 
     PRIMARY KEY (idDokumen),
 
@@ -100,6 +106,7 @@ CREATE TABLE Pengajuan (
     statusPengajuan VARCHAR(30) NOT NULL
         DEFAULT 'Menunggu Verifikasi',
 
+    dataFormulir JSON NULL,
     alasanPenolakan TEXT NULL,
     idStaf INT NULL,
     waktuKeputusan TIMESTAMP NULL DEFAULT NULL,
@@ -153,13 +160,13 @@ CREATE TABLE DokumenPengajuan (
         FOREIGN KEY (idDokumen)
         REFERENCES DokumenPersyaratan(idDokumen),
 
-    CONSTRAINT chk_dokumenpengajuan_format
-        CHECK (formatFile = 'PDF'),
+    CONSTRAINT chk_dokumenpengajuan_format_diizinkan
+        CHECK (formatFile IN ('PDF', 'JPG', 'PNG', 'WEBP', 'GIF', 'DOC', 'DOCX', 'XLS', 'XLSX')),
 
-    CONSTRAINT chk_dokumenpengajuan_ukuran
+    CONSTRAINT chk_dokumenpengajuan_ukuran_maks
         CHECK (
             ukuranFile > 0
-            AND ukuranFile <= 10485760
+            AND ukuranFile <= 104857600
         )
 ) ENGINE=InnoDB;
 
