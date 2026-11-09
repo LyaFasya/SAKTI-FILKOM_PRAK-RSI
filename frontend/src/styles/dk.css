@@ -1,0 +1,164 @@
+/* Gaya tambahan untuk halaman mahasiswa milik DK (pengajuan, riwayat, notifikasi).
+   Semua aturan di dalam .mhs-app; warna memakai variabel --m-* dari mahasiswa-theme.css. */
+
+.mhs-app .sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+.mhs-app .eyebrow { display: block; margin-bottom: 10px; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--m-blue-600); }
+.mhs-app .tanda-wajib { color: var(--m-ditolak-teks); }
+.mhs-app .kotak-ikon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 18px; color: var(--m-blue-600); background: #e8f1fd; border-radius: 14px; }
+.mhs-app .tautan-teks { padding: 0; font: inherit; font-size: 0.85rem; font-weight: 600; color: var(--m-blue-600); text-decoration: none; background: none; border: 0; cursor: pointer; }
+.mhs-app .tautan-teks:hover { text-decoration: underline; }
+.mhs-app .tautan-teks:disabled { cursor: default; text-decoration: none; }
+.mhs-app .kolom { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.mhs-app .kartu--polos h2, .mhs-app .kartu--info h2 { font-size: 1.1rem; }
+.mhs-app .kartu--info p { margin: 0 0 4px; font-size: 0.8rem; }
+
+/* ---------- Formulir ---------- */
+.mhs-app .grid-form { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.mhs-app .panel-layanan { position: sticky; top: 104px; }
+.mhs-app .panel-layanan h2 { margin: 0 0 18px; font-size: 1.35rem; line-height: 1.3; }
+.mhs-app .langkah-form { margin: 0 0 18px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.78rem; }
+.mhs-app .langkah-form span { margin-right: 10px; color: #9eb0cb; font-size: 0.7rem; }
+.mhs-app .kotak-info { margin-bottom: 18px; padding: 16px 18px; font-size: 0.78rem; line-height: 1.6; color: var(--m-redup); background: var(--m-info-bg); border: 2px solid var(--m-garis-tegas); border-radius: 18px; }
+.mhs-app .catatan { margin: 0; font-size: 0.72rem; line-height: 1.6; color: var(--m-redup); }
+
+.mhs-app .kartu-form { padding: 32px 34px; }
+.mhs-app .bagian-judul { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.mhs-app .bagian-judul h2 { margin: 0; font-size: 1.1rem; }
+.mhs-app .nomor-bagian { display: grid; place-items: center; min-width: 30px; height: 26px; padding: 0 6px; font-size: 0.7rem; font-weight: 600; color: #fff; background: linear-gradient(135deg, #405fb4, #334daf); border-radius: 9px; }
+.mhs-app .pemisah-bagian { height: 2px; margin: 32px 0; background: var(--m-garis); border: 0; }
+
+.mhs-app .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.mhs-app .field__label, .mhs-app .grup-pilihan legend { padding: 0; font-size: 0.8rem; font-weight: 700; color: var(--m-navy-800); }
+.mhs-app .field__petunjuk { font-size: 0.7rem; color: var(--m-redup); }
+.mhs-app .field__galat { font-size: 0.75rem; color: var(--m-ditolak-teks); }
+.mhs-app [aria-invalid="true"] { border-color: var(--m-ditolak-teks); box-shadow: none; }
+
+.mhs-app .grup-pilihan { margin: 0 0 20px; padding: 0; border: 0; min-width: 0; }
+.mhs-app .grup-pilihan legend { margin-bottom: 8px; }
+.mhs-app .grup-pilihan__daftar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.mhs-app .pilihan, .mhs-app .kotak-centang {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  font-size: 0.78rem; background: #fcfdff; border: 2px solid var(--m-garis); border-radius: 14px; cursor: pointer;
+}
+.mhs-app .pilihan:has(input:checked) { border-color: var(--m-blue-500); }
+.mhs-app .grup-pilihan:disabled .pilihan { cursor: default; }
+.mhs-app .pilihan input, .mhs-app .kotak-centang input { width: auto; margin: 0; padding: 0; accent-color: var(--m-blue-600); box-shadow: none; }
+.mhs-app .kotak-centang { margin-bottom: 20px; }
+.mhs-app .kotak-centang small { color: var(--m-redup); font-size: 0.68rem; }
+
+.mhs-app .input-tanggal { position: relative; }
+.mhs-app .input-tanggal input { width: 100%; padding-right: 46px; }
+.mhs-app .input-tanggal input[type="date"]::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.mhs-app .input-tanggal svg { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--m-blue-600); pointer-events: none; }
+
+.mhs-app .slot-unggah { margin-bottom: 20px; padding: 24px; background: #f4f8fe; border: 2px dashed var(--m-diproses-garis); border-radius: 22px; }
+.mhs-app .slot-unggah--galat { border-color: var(--m-ditolak-teks); }
+.mhs-app .slot-unggah__judul { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-size: 0.88rem; font-weight: 700; color: var(--m-navy-800); }
+.mhs-app .slot-unggah__judul .badge { font-weight: 500; color: var(--m-redup); background: #eef3fb; border-color: var(--m-garis); }
+.mhs-app .slot-unggah p { margin: 0 0 8px; font-size: 0.7rem; color: var(--m-redup); }
+.mhs-app .slot-unggah__label { display: block; margin: 14px 0 8px; font-size: 0.78rem; font-weight: 700; color: var(--m-navy-800); }
+.mhs-app .slot-unggah input[type="file"] { width: 100%; padding: 12px 16px; background: #fff; }
+.mhs-app .slot-unggah input[type="file"]::file-selector-button { margin-right: 12px; padding: 6px 12px; font: inherit; font-size: 0.78rem; font-weight: 600; color: var(--m-blue-600); background: var(--m-info-bg); border: 0; border-radius: 10px; cursor: pointer; }
+.mhs-app .berkas-terpilih, .mhs-app .berkas-item {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  background: #fcfdff; border: 2px solid var(--m-garis); border-radius: 16px;
+}
+.mhs-app .berkas-terpilih { margin-top: 14px; }
+.mhs-app .berkas__ikon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; font-size: 0.58rem; font-weight: 600; color: var(--m-blue-600); background: var(--m-info-bg); border-radius: 10px; }
+.mhs-app .berkas__info { flex: 1; min-width: 0; }
+.mhs-app .berkas__nama { display: block; font-size: 0.8rem; font-weight: 700; color: var(--m-navy-800); overflow-wrap: anywhere; }
+.mhs-app .berkas__ket { display: block; font-size: 0.68rem; color: var(--m-redup); }
+
+.mhs-app .ringkasan-galat { margin-bottom: 20px; padding: 18px 20px; background: var(--m-ditolak-bg); border: 2px solid var(--m-ditolak-garis); border-radius: 18px; }
+.mhs-app .ringkasan-galat strong { display: block; margin-bottom: 8px; font-size: 0.78rem; color: var(--m-ditolak-teks); }
+.mhs-app .ringkasan-galat ul { margin: 0; padding-left: 22px; font-size: 0.75rem; color: var(--m-ditolak-teks); line-height: 1.8; }
+.mhs-app .ringkasan-galat:focus-visible { outline: 3px solid var(--m-ditolak-teks); outline-offset: 2px; }
+.mhs-app .aksi-form { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
+
+/* ---------- Pengajuan saya ---------- */
+.mhs-app .kartu-daftar { padding: 26px 28px 28px; }
+.mhs-app .toolbar-saya { display: grid; grid-template-columns: minmax(0, 1fr) 340px auto auto; gap: 14px; margin-bottom: 22px; }
+.mhs-app .toolbar-saya input, .mhs-app .toolbar-saya select { width: 100%; height: 50px; }
+.mhs-app .toolbar-saya .tombol { height: 46px; align-self: center; }
+.mhs-app .tabel-saya { overflow-x: auto; background: #fcfdff; border: 2px solid var(--m-garis); border-radius: 22px; }
+.mhs-app .tabel-saya table { width: 100%; border-collapse: collapse; }
+.mhs-app .tabel-saya th { padding: 16px 16px; text-align: left; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--m-redup); background: #e9f0fa; }
+.mhs-app .tabel-saya td { padding: 22px 16px; font-size: 0.8rem; border-top: 2px solid var(--m-garis); }
+.mhs-app .tabel-saya td:first-child { font-weight: 700; white-space: nowrap; }
+.mhs-app .tabel-saya a { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; text-decoration: none; }
+.mhs-app .tabel-saya a:hover { text-decoration: underline; }
+.mhs-app .kosong-tabel { padding: 56px 16px 64px; text-align: center; border-top: 2px solid var(--m-garis); }
+.mhs-app .kosong-tabel strong { display: block; margin-bottom: 14px; font-size: 0.95rem; color: var(--m-navy-800); }
+.mhs-app .kosong-tabel p { margin: 0; font-size: 0.85rem; color: var(--m-redup); }
+@media (max-width: 900px) { .mhs-app .toolbar-saya { grid-template-columns: 1fr 1fr; } .mhs-app .toolbar-saya input, .mhs-app .toolbar-saya select { grid-column: 1 / -1; } }
+
+/* ---------- Pengajuan terkirim ---------- */
+.mhs-app .kartu-terkirim { max-width: 700px; margin: 24px auto 0; padding: 48px 50px; text-align: center; }
+.mhs-app .ikon-berhasil { display: grid; place-items: center; width: 48px; height: 48px; margin: 0 auto 28px; color: var(--m-disetujui-teks); background: var(--m-disetujui-bg); border-radius: 14px; }
+.mhs-app .kartu-terkirim h1 { margin: 0 0 14px; font-size: 2rem; font-weight: 800; letter-spacing: -0.035em; }
+.mhs-app .kartu-terkirim > p { max-width: 520px; margin: 0 auto 24px; font-size: 0.85rem; line-height: 1.7; color: var(--m-redup); }
+.mhs-app .kotak-id { margin-bottom: 20px; padding: 18px 20px; background: var(--m-info-bg); border: 2px solid var(--m-garis); border-radius: 18px; }
+.mhs-app .kotak-id strong { display: block; font-size: 1.2rem; font-weight: 600; color: #4a6fa5; }
+.mhs-app .kotak-id span { font-size: 0.75rem; color: #4a6fa5; }
+.mhs-app .kartu-terkirim .aksi-form { justify-content: center; margin-top: 26px; }
+
+/* ---------- Detail pengajuan ---------- */
+.mhs-app .baris-id { display: flex; align-items: center; gap: 12px; margin: -8px 0 18px; font-size: 0.85rem; font-weight: 700; color: var(--m-navy-800); }
+.mhs-app .baris-id time { margin-left: auto; font-size: 0.75rem; font-weight: 400; color: var(--m-redup); }
+.mhs-app .grid-detail { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.mhs-app .kartu-detail h2.judul-layanan { margin: 0 0 22px; font-size: 1.35rem; }
+.mhs-app .kartu-detail h3 { margin: 26px 0 14px; font-size: 1rem; font-weight: 800; }
+.mhs-app .daftar-info { margin: 0; }
+.mhs-app .daftar-info div { display: flex; justify-content: space-between; gap: 20px; padding: 15px 0; font-size: 0.78rem; border-bottom: 2px solid var(--m-garis); }
+.mhs-app .daftar-info dt { color: var(--m-redup); }
+.mhs-app .daftar-info dd { margin: 0; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.mhs-app .daftar-isian div { display: block; padding: 14px 0; }
+.mhs-app .daftar-isian dt { margin-bottom: 4px; font-size: 0.7rem; }
+.mhs-app .daftar-isian dd { font-size: 0.85rem; font-weight: 500; text-align: left; }
+.mhs-app .info-berkas { margin-bottom: 14px; padding: 18px 20px; font-size: 0.78rem; color: var(--m-redup); background: var(--m-info-bg); border: 2px solid var(--m-garis); border-radius: 16px; }
+.mhs-app .daftar-berkas { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.mhs-app .berkas-item .badge { font-size: 0.68rem; }
+.mhs-app .berkas-item .tautan-teks { margin: 0 6px 0 4px; }
+.mhs-app .kartu-alasan h2 { color: var(--m-ditolak-teks); font-size: 1.1rem; }
+.mhs-app .kartu-alasan p { margin: 0; font-size: 0.8rem; line-height: 1.7; color: var(--m-redup); }
+.mhs-app .kartu-perkembangan p { margin: 0 0 18px; font-size: 0.78rem; }
+
+/* ---------- Lacak status ---------- */
+.mhs-app .kepala-lacak { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.mhs-app .kepala-lacak h2 { margin: 0 0 12px; font-size: 1.4rem; }
+.mhs-app .layanan-lacak { margin: 0 0 26px; font-size: 0.8rem; }
+.mhs-app .linimasa { margin: 0; padding: 0; list-style: none; }
+.mhs-app .linimasa__item { position: relative; padding: 0 0 28px 38px; }
+.mhs-app .linimasa__item:last-child { padding-bottom: 6px; }
+.mhs-app .linimasa__item::before { content: ""; position: absolute; left: 9px; top: 22px; bottom: 0; width: 2px; background: var(--m-garis-tegas); }
+.mhs-app .linimasa__item:last-child::before { display: none; }
+.mhs-app .linimasa__titik { position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 20px; height: 20px; color: #fff; background: #72a6e0; border-radius: 50%; }
+.mhs-app .linimasa__judul { display: block; font-size: 0.85rem; font-weight: 700; color: var(--m-navy-800); }
+.mhs-app .linimasa__waktu { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--m-redup); }
+.mhs-app .kotak-alasan { margin-top: 18px; padding: 18px 20px; font-size: 0.8rem; color: var(--m-ditolak-teks); background: var(--m-ditolak-bg); border: 2px solid var(--m-ditolak-garis); border-radius: 16px; }
+.mhs-app .kotak-alasan strong { display: block; margin-bottom: 4px; font-size: 0.8rem; }
+
+/* ---------- Notifikasi ---------- */
+.mhs-app .daftar-notifikasi { margin: 0; padding: 0; list-style: none; }
+.mhs-app .notifikasi__tautan { display: flex; align-items: center; gap: 16px; padding: 22px 0; color: inherit; text-decoration: none; border-bottom: 2px solid var(--m-garis); }
+.mhs-app .daftar-notifikasi li:first-child .notifikasi__tautan { padding-top: 4px; }
+.mhs-app .notifikasi__tautan:hover .notifikasi__judul { color: var(--m-blue-600); }
+.mhs-app .notifikasi__ikon { align-self: flex-start; display: grid; place-items: center; flex: none; width: 48px; height: 48px; color: var(--m-blue-600); background: #e8f1fd; border-radius: 14px; }
+.mhs-app .notifikasi__isi { flex: 1; min-width: 0; }
+.mhs-app .notifikasi__judul { display: block; margin-bottom: 4px; font-size: 0.9rem; font-weight: 700; color: var(--m-navy-800); }
+.mhs-app .notifikasi__pesan { margin: 0 0 6px; font-size: 0.8rem; color: var(--m-redup); }
+.mhs-app .notifikasi__waktu { font-size: 0.75rem; color: var(--m-redup); }
+.mhs-app .notifikasi__email-gagal { margin: 6px 0 0; font-size: 0.72rem; color: var(--m-ditolak-teks); }
+.mhs-app .notifikasi__panah { align-self: flex-start; margin-top: 6px; color: var(--m-navy-800); }
+
+@media (max-width: 900px) {
+  .mhs-app .grid-form, .mhs-app .grid-detail { grid-template-columns: 1fr; }
+  .mhs-app .panel-layanan { position: static; }
+  .mhs-app .grup-pilihan__daftar { grid-template-columns: 1fr; }
+  .mhs-app .kartu-form { padding: 24px 20px; }
+  .mhs-app .kartu-terkirim { padding: 32px 22px; }
+}
