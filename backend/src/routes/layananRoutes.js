@@ -5,6 +5,7 @@ import {
   melihatDetailLayanan,
   melihatPersyaratanLayanan,
   memperbaruiInformasiLayanan,
+  memperbaruiPersyaratanLayanan,
 } from "../controllers/LayananController.js";
 
 import {
@@ -29,6 +30,12 @@ router.patch(
   "/:idLayanan",
   khususStaf,
   memperbaruiInformasiLayanan
+);
+
+router.patch(
+  "/:idLayanan/persyaratan",
+  khususStaf,
+  memperbaruiPersyaratanLayanan
 );
 
 export default router;
