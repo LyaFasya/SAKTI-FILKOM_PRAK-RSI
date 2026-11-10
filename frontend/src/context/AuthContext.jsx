@@ -2,33 +2,49 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 
 import * as authService from "../services/authService.js";
 import {
-  ambilToken,
   ambilUserTersimpan,
   hapusSesi,
-  simpanSesi
+  simpanUser
 } from "../services/api.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // User dipulihkan dari localStorage supaya refresh halaman tidak logout.
-  const [user, setUser] = useState(() =>
-    ambilToken() ? ambilUserTersimpan() : null
-  );
+  // Data akun diambil dari localStorage supaya refresh tidak berkedip ke halaman login.
+  const [user, setUser] = useState(() => ambilUserTersimpan());
+
+  // Saat aplikasi dibuka, pastikan sesi di backend masih berlaku.
+  // Kalau sudah habis (2 jam) backend menjawab 401 dan api.js memicu event di bawah.
+  useEffect(() => {
+    if (!ambilUserTersimpan()) return;
+
+    authService
+      .cekSesi()
+      .then((hasil) => {
+        simpanUser(hasil.data);
+        setUser(hasil.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const hasil = await authService.login(email, password);
-    simpanSesi(hasil.token, hasil.data);
+    simpanUser(hasil.data);
     setUser(hasil.data);
     return hasil.data;
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout();
+    } catch {
+      // Tetap keluar di sisi tampilan meskipun backend tidak terjangkau.
+    }
     hapusSesi();
     setUser(null);
   }, []);
 
-  // Dipicu api.js ketika backend menjawab 401 (token salah atau habis 2 jam).
+  // Dipicu api.js ketika backend menjawab 401 (belum login atau sesi habis).
   useEffect(() => {
     const saatTidakSah = () => setUser(null);
     window.addEventListener("sakti:unauthorized", saatTidakSah);

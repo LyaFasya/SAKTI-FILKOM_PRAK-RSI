@@ -1,10 +1,10 @@
 // Pembungkus fetch untuk semua panggilan ke backend.
-// - Otomatis menambahkan header Authorization: Bearer <token>
+// - Login memakai session cookie (sakti.sid) yang diatur backend,
+//   jadi frontend cukup mengirim cookie lewat credentials: "include".
 // - Mengubah respons error menjadi ApiError dengan pesan dari backend
-// - Jika backend menjawab 401 (token salah/kedaluwarsa), sesi dihapus
+// - Jika backend menjawab 401 (sesi habis/belum login), data user dihapus
 //   dan AuthContext diberi tahu lewat event "sakti:unauthorized"
 
-const KEY_TOKEN = "sakti_token";
 const KEY_USER = "sakti_user";
 
 export class ApiError extends Error {
@@ -16,10 +16,8 @@ export class ApiError extends Error {
   }
 }
 
-export function ambilToken() {
-  return localStorage.getItem(KEY_TOKEN);
-}
-
+// Hanya data akun (idAkun, email, role) agar halaman tidak berkedip saat refresh.
+// Keabsahan sesi tetap ditentukan backend lewat cookie.
 export function ambilUserTersimpan() {
   try {
     return JSON.parse(localStorage.getItem(KEY_USER));
@@ -28,13 +26,11 @@ export function ambilUserTersimpan() {
   }
 }
 
-export function simpanSesi(token, user) {
-  localStorage.setItem(KEY_TOKEN, token);
+export function simpanUser(user) {
   localStorage.setItem(KEY_USER, JSON.stringify(user));
 }
 
 export function hapusSesi() {
-  localStorage.removeItem(KEY_TOKEN);
   localStorage.removeItem(KEY_USER);
 }
 
@@ -43,10 +39,7 @@ export async function apiRequest(
   { method = "GET", body, abaikanUnauthorized = false } = {}
 ) {
   const headers = {};
-  const token = ambilToken();
-
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (token) headers.Authorization = `Bearer ${token}`;
 
   let response;
 
@@ -54,6 +47,7 @@ export async function apiRequest(
     response = await fetch(`/api${path}`, {
       method,
       headers,
+      credentials: "include",
       body: body !== undefined ? JSON.stringify(body) : undefined
     });
   } catch {
