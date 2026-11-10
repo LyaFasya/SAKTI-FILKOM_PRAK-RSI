@@ -40,6 +40,10 @@ const Pengajuan = database.define(
         ],
       },
     },
+    dataFormulir: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
     alasanPenolakan: {
       type: DataTypes.TEXT,
       allowNull: true,

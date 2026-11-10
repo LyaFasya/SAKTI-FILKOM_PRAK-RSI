@@ -34,7 +34,7 @@ const DokumenPengajuan = database.define(
       type: DataTypes.STRING(10),
       allowNull: false,
       validate: {
-        isIn: [["PDF"]],
+        isIn: [["PDF", "JPG", "PNG", "WEBP", "GIF", "DOC", "DOCX", "XLS", "XLSX"]],
       },
     },
     ukuranFile: {
@@ -42,7 +42,7 @@ const DokumenPengajuan = database.define(
       allowNull: false,
       validate: {
         min: 1,
-        max: 10485760,
+        max: 104857600,
       },
     },
     lokasiFile: {
