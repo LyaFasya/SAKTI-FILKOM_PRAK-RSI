@@ -23,14 +23,6 @@ export const pengajuanDummy = [
   { idPengajuan: 5, nim: "255150400000001", namaMahasiswa: "Mahasiswa Contoh", idLayanan: 5, namaLayanan: nama(5), tanggalPengajuan: "2026-10-19", statusPengajuan: "Menunggu Verifikasi", alasanPenolakan: null }
 ];
 
-// ---------- Data untuk halaman Detail, Verifikasi, Persetujuan, Penolakan ----------
-// Sementara dummy. Nama berkas dan jenis dokumen di bawah hanya contoh, nanti diganti data asli
-// dari tabel DokumenPengajuan dan DokumenPersyaratan.
-export const mahasiswaDummy = {
-  "255150401111009": { programStudi: "Sistem Informasi", email: "nanda@student.ub.ac.id", noHp: null },
-  "255150400000001": { programStudi: "Teknik Informatika", email: "mahasiswa@example.com", noHp: null }
-};
-
 const dok = (idDokumen, jenisDokumen, namaFile, hasilVerifikasi) => ({
   idDokumen, jenisDokumen, namaFile, wajib: true, hasilVerifikasi
 });

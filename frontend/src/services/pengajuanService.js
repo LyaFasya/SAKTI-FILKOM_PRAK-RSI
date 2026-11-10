@@ -1,78 +1,99 @@
-// MASIH MEMAKAI DATA DUMMY. Backend belum punya endpoint pengajuan.
-// Bentuk nilai kembalian sengaja dibuat mirip dengan yang kemungkinan dikirim backend.
-// Nanti ganti isi fungsi dengan apiRequest(...); komponen yang memanggilnya tidak berubah.
+// Sebagian sudah memakai API asli (backend feat/backend-foundation):
+//   ambilDaftarPengajuan, ambilRingkasanPengajuan, ambilOpsiLayanan
+// Masih data dummy (menunggu langkah berikutnya):
+//   ambilDetailPengajuan, simpanHasilVerifikasi, setujuiPengajuan, tolakPengajuan
+import { ApiError, apiRequest } from "./api.js";
+import { ambilDaftarLayanan } from "./layananService.js";
 import {
   keputusanDummy,
   lampiranDummy,
-  layananDummy,
-  mahasiswaDummy,
   pengajuanDummy
 } from "../mocks/pengajuan.js";
-import { DAFTAR_STATUS, STATUS_PENGAJUAN } from "../config/constants.js";
+import { STATUS_PENGAJUAN } from "../config/constants.js";
 import { HASIL_VERIFIKASI, NAMA_STAF, sudahDiputuskan } from "../config/pengajuan.js";
-import { kodePengajuan } from "../utils/format.js";
 
 const tunda = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function saring(daftar, { status, idLayanan, kataKunci } = {}) {
-  const kunci = kataKunci?.trim().toLowerCase();
-
-  return daftar.filter((item) => {
-    if (status && item.statusPengajuan !== status) return false;
-    if (idLayanan && item.idLayanan !== Number(idLayanan)) return false;
-    if (
-      kunci &&
-      !`${kodePengajuan(item)} ${item.namaMahasiswa} ${item.nim} ${item.namaLayanan}`
-        .toLowerCase()
-        .includes(kunci)
-    ) {
-      return false;
-    }
-    return true;
-  });
+// Halaman memakai nama filter { status, idLayanan, kataKunci },
+// backend memakai { statusPengajuan, idLayanan, kataKunci }.
+function bangunQuery({ status, idLayanan, kataKunci } = {}) {
+  const params = new URLSearchParams();
+  if (status) params.set("statusPengajuan", status);
+  if (idLayanan) params.set("idLayanan", idLayanan);
+  if (kataKunci?.trim()) params.set("kataKunci", kataKunci.trim());
+  const teks = params.toString();
+  return teks ? `?${teks}` : "";
 }
 
-// DSB-UC02 / DSB-UC03: daftar pengajuan + pencarian + filter
+// GET /api/pengajuan/staf  ->  data: [{ idPengajuan, kodePengajuan, namaMahasiswa,
+//   nim, idLayanan, namaLayanan, tanggalPengajuan, statusPengajuan }]
 export async function ambilDaftarPengajuan(filter = {}) {
-  await tunda();
-  return saring(pengajuanDummy, filter);
+  const hasil = await apiRequest(`/pengajuan/staf${bangunQuery(filter)}`);
+  return hasil.data;
 }
 
-// DSB-UC01: ringkasan jumlah (total, per status, per jenis layanan)
+// GET /api/pengajuan/staf/ringkasan
+// Bentuk dari backend diubah supaya sama dengan yang dipakai DashboardPage.
 export async function ambilRingkasanPengajuan(filter = {}) {
-  await tunda();
-  const data = saring(pengajuanDummy, filter);
+  const hasil = await apiRequest(`/pengajuan/staf/ringkasan${bangunQuery(filter)}`);
+  const data = hasil.data;
 
-  const perStatus = Object.fromEntries(
-    DAFTAR_STATUS.map((status) => [
-      status,
-      data.filter((item) => item.statusPengajuan === status).length
-    ])
-  );
-
-  const perLayanan = {};
-  for (const item of data) {
-    perLayanan[item.namaLayanan] = (perLayanan[item.namaLayanan] ?? 0) + 1;
-  }
-
-  return { total: data.length, perStatus, perLayanan };
+  return {
+    total: data.total,
+    perStatus: {
+      [STATUS_PENGAJUAN.MENUNGGU_VERIFIKASI]: data.menungguVerifikasi,
+      [STATUS_PENGAJUAN.DIPROSES]: data.diproses,
+      [STATUS_PENGAJUAN.DISETUJUI]: data.disetujui,
+      [STATUS_PENGAJUAN.DITOLAK]: data.ditolak
+    },
+    perLayanan: data.perLayanan
+  };
 }
+
+// Pilihan untuk dropdown "Jenis layanan" (GET /api/layanan).
+export async function ambilOpsiLayanan() {
+  const daftar = await ambilDaftarLayanan();
+  return daftar.map(({ idLayanan, namaLayanan }) => ({ idLayanan, namaLayanan }));
+}
+
+// ======================= MASIH DUMMY DI BAWAH INI =======================
 
 const cariPengajuan = (idPengajuan) =>
   pengajuanDummy.find((item) => item.idPengajuan === Number(idPengajuan));
 
 // PJN-UC08: detail satu pengajuan (identitas, lampiran, keputusan). null kalau tidak ada.
-export async function ambilDetailPengajuan(idPengajuan) {
-  await tunda();
-  const pengajuan = cariPengajuan(idPengajuan);
-  if (!pengajuan) return null;
+// Bentuk detail dari backend diubah supaya sama dengan yang dipakai halaman Detail.
+function ubahDetailBackend(d) {
+  return {
+    ...d,
+    mahasiswa: {
+      programStudi: d.programStudi ?? "-",
+      email: d.email ?? "-",
+      noHp: d.nomorHp ?? null
+    },
+    // idDokumen di halaman = idDokumenPengajuan (id satu berkas yang diunggah mahasiswa),
+    // karena itu yang dibutuhkan backend saat menyimpan hasil verifikasi.
+    lampiran: d.lampiran.map((l) => ({
+      idDokumen: l.idDokumenPengajuan,
+      jenisDokumen: l.namaDokumen,
+      namaFile: l.namaFile,
+      hasilVerifikasi: l.statusDokumen ?? HASIL_VERIFIKASI.BELUM
+    })),
+    keputusan: d.waktuKeputusan
+      ? { diputuskanOleh: NAMA_STAF, waktu: d.waktuKeputusan, dokumenHasil: null }
+      : null
+  };
+}
 
-  return structuredClone({
-    ...pengajuan,
-    mahasiswa: mahasiswaDummy[pengajuan.nim] ?? { programStudi: "-", email: "-", noHp: null },
-    lampiran: lampiranDummy[pengajuan.idPengajuan] ?? [],
-    keputusan: keputusanDummy[pengajuan.idPengajuan] ?? null
-  });
+// GET /api/pengajuan/staf/:id  ->  null kalau tidak ditemukan (404)
+export async function ambilDetailPengajuan(idPengajuan) {
+  try {
+    const hasil = await apiRequest(`/pengajuan/staf/${idPengajuan}`);
+    return ubahDetailBackend(hasil.data);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
 }
 
 function ambilPengajuanBelumDiputuskan(idPengajuan) {
@@ -84,9 +105,6 @@ function ambilPengajuanBelumDiputuskan(idPengajuan) {
   return pengajuan;
 }
 
-// PJN-UC09: simpan hasil pemeriksaan satu lampiran.
-// ASUMSI: begitu ada lampiran yang diperiksa, status pengajuan berubah dari
-// "Menunggu Verifikasi" menjadi "Diproses". Cocokkan dengan RF.
 export async function simpanHasilVerifikasi(idPengajuan, idDokumen, hasil) {
   await tunda(150);
   const pengajuan = ambilPengajuanBelumDiputuskan(idPengajuan);
@@ -106,8 +124,6 @@ export async function simpanHasilVerifikasi(idPengajuan, idDokumen, hasil) {
   }
 }
 
-// PJN-UC10 dan PJN-UC11: setujui pengajuan dengan dokumen hasil.
-// Berkasnya belum benar-benar diunggah; yang disimpan baru namanya.
 export async function setujuiPengajuan(idPengajuan, namaDokumenHasil) {
   await tunda(300);
   const pengajuan = ambilPengajuanBelumDiputuskan(idPengajuan);
@@ -127,7 +143,6 @@ export async function setujuiPengajuan(idPengajuan, namaDokumenHasil) {
   };
 }
 
-// PJN-UC12 dan PJN-UC13: tolak pengajuan beserta alasannya.
 export async function tolakPengajuan(idPengajuan, alasan) {
   await tunda(300);
   const pengajuan = ambilPengajuanBelumDiputuskan(idPengajuan);
@@ -141,11 +156,4 @@ export async function tolakPengajuan(idPengajuan, alasan) {
     waktu: new Date().toISOString(),
     dokumenHasil: null
   };
-}
-
-// Pilihan untuk dropdown "Jenis layanan".
-// Sementara dari data dummy karena tabel Layanan di database masih kosong.
-export async function ambilOpsiLayanan() {
-  await tunda(100);
-  return layananDummy;
 }
