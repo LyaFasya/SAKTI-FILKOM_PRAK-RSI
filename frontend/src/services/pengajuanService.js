@@ -1,7 +1,7 @@
 // Sebagian sudah memakai API asli (backend feat/backend-foundation):
 //   ambilDaftarPengajuan, ambilRingkasanPengajuan, ambilOpsiLayanan
-// Masih data dummy (menunggu langkah berikutnya):
-//   ambilDetailPengajuan, simpanHasilVerifikasi, setujuiPengajuan, tolakPengajuan
+// Sudah API asli juga: ambilDetailPengajuan, simpanHasilVerifikasi, tolakPengajuan
+// Masih data dummy (menunggu kunci Supabase): setujuiPengajuan
 import { ApiError, apiRequest } from "./api.js";
 import { ambilDaftarLayanan } from "./layananService.js";
 import {
@@ -105,23 +105,19 @@ function ambilPengajuanBelumDiputuskan(idPengajuan) {
   return pengajuan;
 }
 
+// PATCH /api/pengajuan/staf/:id/verifikasi/:idDokumenPengajuan  body: { statusDokumen }
+// `idDokumen` di sini adalah idDokumenPengajuan (lihat ubahDetailBackend).
+// Backend hanya menerima "Sesuai" atau "Tidak Sesuai", dan hanya untuk pengajuan berstatus Diproses.
 export async function simpanHasilVerifikasi(idPengajuan, idDokumen, hasil) {
-  await tunda(150);
-  const pengajuan = ambilPengajuanBelumDiputuskan(idPengajuan);
-
   if (hasil !== HASIL_VERIFIKASI.SESUAI && hasil !== HASIL_VERIFIKASI.TIDAK_SESUAI) {
     throw new Error("Pilih hasil pemeriksaan terlebih dahulu.");
   }
 
-  const dokumen = (lampiranDummy[pengajuan.idPengajuan] ?? []).find(
-    (d) => d.idDokumen === idDokumen
+  const respons = await apiRequest(
+    `/pengajuan/staf/${idPengajuan}/verifikasi/${idDokumen}`,
+    { method: "PATCH", body: { statusDokumen: hasil } }
   );
-  if (!dokumen) throw new Error("Lampiran tidak ditemukan.");
-
-  dokumen.hasilVerifikasi = hasil;
-  if (pengajuan.statusPengajuan === STATUS_PENGAJUAN.MENUNGGU_VERIFIKASI) {
-    pengajuan.statusPengajuan = STATUS_PENGAJUAN.DIPROSES;
-  }
+  return respons.data;
 }
 
 export async function setujuiPengajuan(idPengajuan, namaDokumenHasil) {
@@ -143,17 +139,15 @@ export async function setujuiPengajuan(idPengajuan, namaDokumenHasil) {
   };
 }
 
+// PATCH /api/pengajuan/staf/:id/tolak  body: { alasanPenolakan }
+// Backend menolak kalau status bukan Diproses, atau masih ada berkas yang belum diverifikasi
+// (pesan errornya ditampilkan apa adanya di popup konfirmasi).
 export async function tolakPengajuan(idPengajuan, alasan) {
-  await tunda(300);
-  const pengajuan = ambilPengajuanBelumDiputuskan(idPengajuan);
-
   if (!alasan?.trim()) throw new Error("Alasan penolakan wajib diisi.");
 
-  pengajuan.statusPengajuan = STATUS_PENGAJUAN.DITOLAK;
-  pengajuan.alasanPenolakan = alasan.trim();
-  keputusanDummy[pengajuan.idPengajuan] = {
-    diputuskanOleh: NAMA_STAF,
-    waktu: new Date().toISOString(),
-    dokumenHasil: null
-  };
+  const respons = await apiRequest(`/pengajuan/staf/${idPengajuan}/tolak`, {
+    method: "PATCH",
+    body: { alasanPenolakan: alasan.trim() }
+  });
+  return respons.data;
 }

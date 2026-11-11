@@ -19,11 +19,16 @@ function FormLampiran({ idPengajuan, lampiran, onTersimpan }) {
   const [menyimpan, setMenyimpan] = useState(false);
   const [pesan, setPesan] = useState({ jenis: "", teks: "" });
 
-  async function simpan() {
+  // Hasil yang dipilih (nilaiBaru) langsung disimpan. Tombol Simpan memakai nilai yang sedang tampil.
+  async function simpan(nilaiBaru = hasil) {
     setPesan({ jenis: "", teks: "" });
+    if (!nilaiBaru) {
+      setPesan({ jenis: "error", teks: "Pilih hasil pemeriksaan terlebih dahulu." });
+      return;
+    }
     setMenyimpan(true);
     try {
-      await simpanHasilVerifikasi(idPengajuan, lampiran.idDokumen, hasil);
+      await simpanHasilVerifikasi(idPengajuan, lampiran.idDokumen, nilaiBaru);
       setPesan({ jenis: "ok", teks: "Hasil pemeriksaan tersimpan." });
       onTersimpan();
     } catch (error) {
@@ -59,12 +64,20 @@ function FormLampiran({ idPengajuan, lampiran, onTersimpan }) {
         <label htmlFor={idSelect} className="sr-only" style={{ position: "absolute", left: "-9999px" }}>
           Hasil pemeriksaan {lampiran.jenisDokumen}
         </label>
-        <select id={idSelect} value={hasil} onChange={(e) => setHasil(e.target.value)}>
+        <select
+          id={idSelect}
+          value={hasil}
+          disabled={menyimpan}
+          onChange={(e) => {
+            setHasil(e.target.value);
+            if (e.target.value) simpan(e.target.value);
+          }}
+        >
           <option value="">Pilih hasil</option>
           <option value={HASIL_VERIFIKASI.SESUAI}>{HASIL_VERIFIKASI.SESUAI}</option>
           <option value={HASIL_VERIFIKASI.TIDAK_SESUAI}>{HASIL_VERIFIKASI.TIDAK_SESUAI}</option>
         </select>
-        <button type="button" className="tombol tombol--garis" onClick={simpan} disabled={menyimpan}>
+        <button type="button" className="tombol tombol--garis" onClick={() => simpan()} disabled={menyimpan}>
           {menyimpan ? "Menyimpan..." : "Simpan"}
         </button>
         {pesan.jenis === "ok" && <p className="verifikasi-status" role="status">{pesan.teks}</p>}
@@ -88,11 +101,8 @@ export default function VerifikasiPengajuanPage() {
     return <Navigate to={`/staf/pengajuan/${d.idPengajuan}`} replace />;
   }
 
-  // ASUMSI: lanjut ke persetujuan hanya boleh kalau semua lampiran wajib sudah "Sesuai"
-  // (desain Persetujuan: "Pastikan dokumen wajib sudah diunggah dan diverifikasi Sesuai").
-  const siapDisetujui = d.lampiran.every(
-    (l) => !l.wajib || l.hasilVerifikasi === HASIL_VERIFIKASI.SESUAI
-  );
+  // Backend yang menentukan: true kalau semua dokumen wajib sudah diunggah dan berstatus Sesuai.
+  const siapDisetujui = Boolean(d.bisaLanjutPersetujuan);
 
   return (
     <>
