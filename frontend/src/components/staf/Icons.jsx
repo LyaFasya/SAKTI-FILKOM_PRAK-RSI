@@ -71,3 +71,44 @@ export const IkonPanah = (p) => (
     <path d="M13 6l6 6-6 6" />
   </Ikon>
 );
+
+export const IkonDaftar = (p) => (
+  <Ikon {...p}>
+    <rect x="4" y="4" width="16" height="16" rx="2.5" />
+    <path d="M8 9h8M8 12.5h8M8 16h8" />
+  </Ikon>
+);
+
+export const IkonBeasiswa = (p) => (
+  <Ikon {...p}>
+    <path d="M12 3l9 9-9 9-9-9z" />
+  </Ikon>
+);
+
+export const IkonPiala = (p) => (
+  <Ikon {...p}>
+    <path d="M8 4h8v5a4 4 0 0 1-8 0z" />
+    <path d="M8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3" />
+    <path d="M12 13v4M9 20h6M10 17h4" />
+  </Ikon>
+);
+
+export const IkonCari = (p) => (
+  <Ikon {...p}>
+    <circle cx="11" cy="11" r="6" />
+    <path d="M20 20l-4.2-4.2" />
+  </Ikon>
+);
+
+export const IkonCentang = (p) => (
+  <Ikon {...p}>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
+  </Ikon>
+);
+
+export const IkonPercik = (p) => (
+  <Ikon {...p}>
+    <path d="M12 4l1.8 4.7L18.5 10.5l-4.7 1.8L12 17l-1.8-4.7L5.5 10.5l4.7-1.8z" />
+    <path d="M19 16l.7 1.8L21.5 18.5l-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z" />
+  </Ikon>
+);

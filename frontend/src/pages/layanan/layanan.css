@@ -1,0 +1,95 @@
+/* Gaya halaman Layanan staf (LYN-UI01, LYN-UI02, LYN-UI03). Milik NC. */
+
+/* ---------- Daftar layanan ---------- */
+.layanan-filter { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; }
+.layanan-filter input { flex: 1 1 260px; min-width: 0; padding: 13px 16px; font-size: 0.85rem; background: #fff; }
+.layanan-filter select { flex: 0 0 auto; width: 224px; max-width: 100%; padding: 13px 16px; font-size: 0.85rem; background: #fff; }
+.layanan-filter .tombol { padding: 13px 26px; font-size: 0.85rem; }
+
+.layanan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.layanan-kartu {
+  display: flex; flex-direction: column; padding: 20px 22px 18px;
+  border: 1px solid var(--s-garis); border-radius: 20px; background: #fff;
+  box-shadow: 0 10px 30px rgba(51, 77, 175, 0.07);
+}
+.layanan-kartu__atas { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.layanan-kartu__ikon {
+  display: grid; place-items: center; width: 38px; height: 38px;
+  border-radius: 12px; color: var(--s-blue-600); background: var(--s-diproses-bg);
+}
+.layanan-kartu__ikon--besar { width: 46px; height: 46px; }
+.layanan-kartu__kategori { margin: 0 0 6px; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--s-blue-600); }
+.layanan-kartu__nama { margin: 0 0 8px; font-size: 1.02rem; font-weight: 700; line-height: 1.35; color: var(--s-navy-800); }
+.layanan-kartu__deskripsi { flex: 1; margin: 0 0 18px; font-size: 0.72rem; color: var(--s-redup); }
+.layanan-kartu__aksi { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.layanan-tombol-kecil {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px;
+  font-size: 0.7rem; font-weight: 600; text-decoration: none; color: var(--s-blue-600);
+  border: 1px solid var(--s-garis); border-radius: 10px; background: #fff;
+}
+.layanan-tombol-kecil:hover { background: var(--s-latar-lembut); }
+
+.layanan-kosong {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 48px 16px 52px; text-align: center;
+  border: 1px solid var(--s-garis); border-radius: 22px; background: #fff;
+  box-shadow: 0 10px 30px rgba(51, 77, 175, 0.07);
+}
+.layanan-kosong__ikon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; color: var(--s-blue-600); background: var(--s-diproses-bg); }
+.layanan-kosong strong { font-size: 1rem; color: var(--s-navy-800); }
+.layanan-kosong span { font-size: 0.85rem; color: var(--s-redup); }
+
+/* ---------- Detail layanan ---------- */
+.layanan-detail { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start; }
+.layanan-detail .staf-panel { margin-bottom: 0; }
+.layanan-detail__samping { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.layanan-detail__samping .layanan-judul { margin-top: 10px; }
+
+.layanan-judul { margin: 0 0 10px; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--s-navy-800); }
+.layanan-subjudul { margin: 26px 0 12px; font-size: 1.02rem; font-weight: 700; color: var(--s-navy-800); }
+.layanan-informasi { margin: 0 0 14px; font-size: 0.88rem; color: var(--s-redup); }
+.layanan-catatan { margin: 0; padding: 12px 16px; font-size: 0.78rem; color: var(--s-blue-600); border: 1px solid var(--s-garis); border-radius: 12px; background: var(--s-latar-lembut); }
+.layanan-catatan--tengah { margin-top: 14px; text-align: center; }
+.layanan-persyaratan { margin: 0; padding-left: 20px; font-size: 0.85rem; color: var(--s-teks); }
+.layanan-persyaratan li { margin-bottom: 6px; }
+
+.layanan-sukses {
+  margin: 0 0 16px; padding: 10px 14px; font-size: 0.82rem; font-weight: 600;
+  color: var(--s-disetujui-teks); border: 1px solid var(--s-disetujui-garis);
+  border-radius: 12px; background: var(--s-disetujui-bg);
+}
+
+.layanan-kelompok { padding: 14px 0 6px; border-top: 1px solid var(--s-garis); }
+.layanan-kelompok summary { display: flex; flex-direction: column; gap: 2px; cursor: pointer; margin-bottom: 8px; }
+.layanan-kelompok__judul { font-size: 0.88rem; font-weight: 700; color: var(--s-navy-800); }
+.layanan-kelompok__ringkas { font-size: 0.68rem; color: var(--s-redup); }
+.layanan-isian-daftar, .layanan-lampiran-daftar { margin: 0 0 8px; padding: 0; list-style: none; }
+.layanan-isian { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; font-size: 0.74rem; border-bottom: 1px solid var(--s-garis); }
+.layanan-isian__label { text-transform: uppercase; color: var(--s-redup); }
+.layanan-isian__tipe { flex: 0 0 auto; font-weight: 700; color: var(--s-navy-800); text-align: right; }
+.layanan-lampiran { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 14px 16px; border: 1px solid var(--s-garis); border-radius: 14px; }
+.layanan-lampiran strong { font-size: 0.8rem; color: var(--s-navy-800); }
+.layanan-lampiran p { margin: 2px 0 0; font-size: 0.7rem; color: var(--s-redup); }
+
+.layanan-aksi { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--s-garis); }
+.layanan-form .layanan-aksi { border-top: 0; padding-top: 0; margin-top: 18px; }
+
+/* ---------- Edit informasi ---------- */
+.layanan-form { max-width: 860px; }
+.layanan-form__kepala { display: flex; align-items: center; gap: 14px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--s-garis); }
+.layanan-form__kepala .layanan-judul { margin: 0; }
+.layanan-form__kepala .layanan-kartu__kategori { margin-bottom: 2px; }
+.layanan-ringkas { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 22px; padding: 14px 18px; font-size: 0.82rem; border: 1px solid var(--s-garis); border-radius: 14px; background: var(--s-latar); }
+.layanan-ringkas span { font-size: 0.72rem; color: var(--s-redup); }
+.layanan-ringkas__status { display: flex; align-items: center; gap: 10px; }
+.layanan-status { padding: 4px 14px; font-size: 0.74rem; font-weight: 600; border: 1px solid var(--s-ditolak-garis); border-radius: 999px; color: var(--s-ditolak-teks); background: var(--s-ditolak-bg); }
+.layanan-status--aktif { color: var(--s-disetujui-teks); border-color: var(--s-disetujui-garis); background: var(--s-disetujui-bg); }
+.layanan-field { display: flex; flex-direction: column; gap: 6px; }
+.layanan-field__label { font-size: 0.82rem; font-weight: 700; }
+.layanan-field__label em { color: var(--s-ditolak-teks); font-style: normal; }
+.layanan-field__bantuan { font-size: 0.72rem; color: var(--s-redup); }
+.layanan-field textarea { width: 100%; padding: 14px 16px; font-size: 0.9rem; line-height: 1.5; resize: vertical; }
+
+@media (max-width: 900px) {
+  .layanan-detail { grid-template-columns: 1fr; }
+}

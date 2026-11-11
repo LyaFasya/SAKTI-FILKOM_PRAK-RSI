@@ -30,6 +30,9 @@ const POLA_HALAMAN = [
   [/^\/staf\/pengajuan\/[^/]+/, "Detail Pengajuan"],
   [/^\/staf\/pengajuan/, "Daftar Pengajuan"],
   [/^\/staf\/rekapitulasi/, "Rekapitulasi"],
+  [/^\/staf\/layanan\/[^/]+\/edit/, "Edit Layanan"],
+  [/^\/staf\/layanan\/[^/]+\/persyaratan/, "Edit Persyaratan Layanan"],
+  [/^\/staf\/layanan\/[^/]+/, "Detail Layanan"],
   [/^\/staf\/layanan/, "Kelola Layanan"]
 ];
 

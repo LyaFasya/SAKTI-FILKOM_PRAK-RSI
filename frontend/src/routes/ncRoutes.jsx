@@ -27,7 +27,9 @@ export const routeGroup = {
     { path: "/staf/rekapitulasi", element: <PlaceholderPage judul="Rekapitulasi" /> },
     { path: "/staf/layanan", element: <DaftarLayananStafPage /> },
     { path: "/staf/layanan/:idLayanan", element: <DetailLayananStafPage /> },
-    { path: "/staf/layanan/:idLayanan/edit", element: <EditLayananStafPage /> }
+    { path: "/staf/layanan/:idLayanan/edit", element: <EditLayananStafPage /> },
+    // LYN-UC04 Edit Persyaratan bukan bagian NC (milik RF). Tombolnya sudah mengarah ke sini.
+    { path: "/staf/layanan/:idLayanan/persyaratan", element: <PlaceholderPage judul="Edit persyaratan layanan" uiId="LYN-UI04" useCase="LYN-UC04 Memperbarui Persyaratan Layanan" /> }
   ]
 };
 

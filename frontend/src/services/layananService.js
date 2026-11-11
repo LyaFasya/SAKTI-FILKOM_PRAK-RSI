@@ -3,9 +3,14 @@ import { apiRequest } from "./api.js";
 // Semua fungsi di sini memanggil API asli milik RF (branch feat/backend-foundation).
 // Respons backend berbentuk { message, data }, jadi yang dikembalikan adalah `data`.
 
-// GET /api/layanan
-export async function ambilDaftarLayanan() {
-  const hasil = await apiRequest("/layanan");
+// GET /api/layanan?kataKunci=&kategoriLayanan=
+// Filter bersifat opsional. Tanpa argumen, semua layanan dikembalikan.
+export async function ambilDaftarLayanan({ kataKunci = "", kategoriLayanan = "" } = {}) {
+  const query = new URLSearchParams();
+  if (kataKunci) query.set("kataKunci", kataKunci);
+  if (kategoriLayanan) query.set("kategoriLayanan", kategoriLayanan);
+  const teks = query.toString();
+  const hasil = await apiRequest(`/layanan${teks ? `?${teks}` : ""}`);
   return hasil.data;
 }
 
