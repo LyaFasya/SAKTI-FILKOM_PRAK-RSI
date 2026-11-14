@@ -4,6 +4,7 @@ import PageHeader from "../../components/PageHeader.jsx";
 import StatusBadge from "../../components/StatusBadge.jsx";
 import DetailTidakDitemukan from "../../components/staf/DetailTidakDitemukan.jsx";
 import TombolLihatBerkas from "../../components/staf/TombolLihatBerkas.jsx";
+import KartuDokumenHasil from "../../components/staf/KartuDokumenHasil.jsx";
 import HasilBadge from "../../components/staf/HasilBadge.jsx";
 import IdentitasMahasiswa from "../../components/staf/IdentitasMahasiswa.jsx";
 import { IkonPanah } from "../../components/staf/Icons.jsx";
@@ -79,22 +80,7 @@ export default function DetailPengajuanPage() {
             )}
           </section>
 
-          {disetujui && (
-            <section className="detail-kartu detail-samping" aria-label="Dokumen hasil">
-              <div className="detail-ikon-surat" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="5" width="18" height="14" rx="2" />
-                  <path d="m3 7 9 6 9-6" />
-                </svg>
-              </div>
-              <h2>Dokumen hasil tersedia</h2>
-              <p>
-                {d.keputusan?.dokumenHasil}<br />
-                Dokumen hasil dikirim sebagai lampiran email ke akun mahasiswa.
-              </p>
-              <p>Dikirim ke {d.mahasiswa.email}</p>
-            </section>
-          )}
+          {disetujui && <KartuDokumenHasil idPengajuan={d.idPengajuan} />}
 
           {ditolak && (
             <section className="detail-kartu detail-samping" aria-label="Alasan penolakan">

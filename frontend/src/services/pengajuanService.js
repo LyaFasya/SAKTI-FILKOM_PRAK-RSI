@@ -151,6 +151,13 @@ export async function setujuiPengajuan(idPengajuan, berkasPdf) {
   return respons.data;
 }
 
+// GET /api/pengajuan/staf/:id/dokumen-hasil -> { namaDokumen, tanggalUpload, url (berlaku 120 detik), ... }
+// Dipanggil lagi setiap kali ingin membuka PDF, karena tautannya cepat kedaluwarsa.
+export async function ambilDokumenHasil(idPengajuan) {
+  const hasil = await apiRequest(`/pengajuan/staf/${idPengajuan}/dokumen-hasil`);
+  return hasil.data;
+}
+
 // GET /api/pengajuan/staf/:id/berkas/:idDokumenPengajuan -> tautan sementara (berlaku 120 detik)
 export async function ambilTautanBerkas(idPengajuan, idDokumenPengajuan) {
   const hasil = await apiRequest(`/pengajuan/staf/${idPengajuan}/berkas/${idDokumenPengajuan}`);
