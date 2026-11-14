@@ -39,7 +39,9 @@ export async function apiRequest(
   { method = "GET", body, abaikanUnauthorized = false } = {}
 ) {
   const headers = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  // FormData (unggah berkas) dikirim apa adanya; browser mengatur Content-Type multipart sendiri.
+  const adalahForm = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !adalahForm) headers["Content-Type"] = "application/json";
 
   let response;
 
@@ -48,7 +50,7 @@ export async function apiRequest(
       method,
       headers,
       credentials: "include",
-      body: body !== undefined ? JSON.stringify(body) : undefined
+      body: body === undefined ? undefined : adalahForm ? body : JSON.stringify(body)
     });
   } catch {
     throw new ApiError(

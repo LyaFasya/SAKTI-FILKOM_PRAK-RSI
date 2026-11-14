@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import PageHeader from "../../components/PageHeader.jsx";
 import StatusBadge from "../../components/StatusBadge.jsx";
 import DetailTidakDitemukan from "../../components/staf/DetailTidakDitemukan.jsx";
+import TombolLihatBerkas from "../../components/staf/TombolLihatBerkas.jsx";
 import HasilBadge from "../../components/staf/HasilBadge.jsx";
 import IdentitasMahasiswa from "../../components/staf/IdentitasMahasiswa.jsx";
 import { IkonPanah } from "../../components/staf/Icons.jsx";
@@ -56,14 +57,7 @@ export default function DetailPengajuanPage() {
                 <div className="berkas__jenis">{l.jenisDokumen}</div>
               </div>
               <HasilBadge hasil={l.hasilVerifikasi} />
-              {/* TODO: buka berkas asli setelah RF membuat endpoint dokumen. */}
-              <button
-                type="button"
-                className="berkas__lihat"
-                onClick={() => window.alert("Pratinjau berkas belum tersedia. Menunggu endpoint dokumen dari backend.")}
-              >
-                Lihat
-              </button>
+              <TombolLihatBerkas idPengajuan={d.idPengajuan} idDokumenPengajuan={l.idDokumen} />
             </div>
           ))}
         </section>

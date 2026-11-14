@@ -6,7 +6,6 @@ import DetailTidakDitemukan from "../../components/staf/DetailTidakDitemukan.jsx
 import IdentitasMahasiswa from "../../components/staf/IdentitasMahasiswa.jsx";
 import Modal from "../../components/staf/Modal.jsx";
 import {
-  HASIL_VERIFIKASI,
   MAKS_UKURAN_DOKUMEN_HASIL,
   NAMA_STAF,
   sudahDiputuskan
@@ -65,10 +64,8 @@ export default function PersetujuanPengajuanPage() {
 
   function tinjau() {
     setPesanForm("");
-    const semuaSesuai = d.lampiran.every(
-      (l) => !l.wajib || l.hasilVerifikasi === HASIL_VERIFIKASI.SESUAI
-    );
-    if (!semuaSesuai) {
+    // Backend yang menentukan apakah semua dokumen wajib sudah diunggah dan berstatus Sesuai.
+    if (!d.bisaLanjutPersetujuan) {
       setPesanForm("Masih ada lampiran wajib yang belum berstatus Sesuai. Selesaikan verifikasi dulu.");
       return;
     }
@@ -84,8 +81,8 @@ export default function PersetujuanPengajuanPage() {
     setMenyimpan(true);
     setPesanPopup("");
     try {
-      // TODO: kirim berkas ke backend (multipart) setelah endpoint tersedia. Sekarang baru namanya.
-      await setujuiPengajuan(d.idPengajuan, berkas.name);
+      // Unggah PDF ke backend, lalu konfirmasi persetujuan.
+      await setujuiPengajuan(d.idPengajuan, berkas);
       navigate(`/staf/pengajuan/${d.idPengajuan}`);
     } catch (err) {
       setPesanPopup(err.message);

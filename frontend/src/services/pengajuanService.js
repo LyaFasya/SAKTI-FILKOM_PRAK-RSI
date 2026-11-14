@@ -1,7 +1,7 @@
 // Sebagian sudah memakai API asli (backend feat/backend-foundation):
 //   ambilDaftarPengajuan, ambilRingkasanPengajuan, ambilOpsiLayanan
 // Sudah API asli juga: ambilDetailPengajuan, simpanHasilVerifikasi, tolakPengajuan
-// Masih data dummy (menunggu kunci Supabase): setujuiPengajuan
+// Sudah API asli juga: setujuiPengajuan (unggah dokumen hasil butuh kunci Supabase di backend), ambilTautanBerkas
 import { ApiError, apiRequest } from "./api.js";
 import { ambilDaftarLayanan } from "./layananService.js";
 import {
@@ -120,23 +120,41 @@ export async function simpanHasilVerifikasi(idPengajuan, idDokumen, hasil) {
   return respons.data;
 }
 
-export async function setujuiPengajuan(idPengajuan, namaDokumenHasil) {
-  await tunda(300);
-  const pengajuan = ambilPengajuanBelumDiputuskan(idPengajuan);
+// Menyetujui pengajuan butuh dua langkah di backend:
+//   1) POST  /api/pengajuan/staf/:id/dokumen-hasil  (multipart, field "dokumenHasil", PDF maks 10 MB)
+//      -> data.versiDokumenHasil
+//   2) PATCH /api/pengajuan/staf/:id/setujui        body: { versiDokumenHasil }
+// Langkah 1 memakai Supabase Storage, jadi butuh SUPABASE_URL dan SUPABASE_SECRET_KEY di backend/.env.
+export async function setujuiPengajuan(idPengajuan, berkasPdf) {
+  if (!berkasPdf) throw new Error("Unggah dokumen hasil terlebih dahulu.");
 
-  if (!namaDokumenHasil) throw new Error("Unggah dokumen hasil terlebih dahulu.");
-  const lampiran = lampiranDummy[pengajuan.idPengajuan] ?? [];
-  if (lampiran.some((d) => d.wajib && d.hasilVerifikasi !== HASIL_VERIFIKASI.SESUAI)) {
-    throw new Error("Semua lampiran wajib harus berstatus Sesuai sebelum disetujui.");
+  const form = new FormData();
+  form.append("dokumenHasil", berkasPdf);
+
+  let unggahan;
+  try {
+    unggahan = await apiRequest(`/pengajuan/staf/${idPengajuan}/dokumen-hasil`, {
+      method: "POST",
+      body: form
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status >= 500) {
+      throw new Error("Dokumen hasil belum bisa diunggah ke Storage. Coba lagi atau hubungi pengelola sistem.");
+    }
+    throw error;
   }
 
-  pengajuan.statusPengajuan = STATUS_PENGAJUAN.DISETUJUI;
-  pengajuan.alasanPenolakan = null;
-  keputusanDummy[pengajuan.idPengajuan] = {
-    diputuskanOleh: NAMA_STAF,
-    waktu: new Date().toISOString(),
-    dokumenHasil: namaDokumenHasil
-  };
+  const respons = await apiRequest(`/pengajuan/staf/${idPengajuan}/setujui`, {
+    method: "PATCH",
+    body: { versiDokumenHasil: unggahan.data.versiDokumenHasil }
+  });
+  return respons.data;
+}
+
+// GET /api/pengajuan/staf/:id/berkas/:idDokumenPengajuan -> tautan sementara (berlaku 120 detik)
+export async function ambilTautanBerkas(idPengajuan, idDokumenPengajuan) {
+  const hasil = await apiRequest(`/pengajuan/staf/${idPengajuan}/berkas/${idDokumenPengajuan}`);
+  return hasil.data.url;
 }
 
 // PATCH /api/pengajuan/staf/:id/tolak  body: { alasanPenolakan }

@@ -5,6 +5,7 @@ import PageHeader from "../../components/PageHeader.jsx";
 import StatusBadge from "../../components/StatusBadge.jsx";
 import DetailTidakDitemukan from "../../components/staf/DetailTidakDitemukan.jsx";
 import IdentitasMahasiswa from "../../components/staf/IdentitasMahasiswa.jsx";
+import TombolLihatBerkas from "../../components/staf/TombolLihatBerkas.jsx";
 import { HASIL_VERIFIKASI, sudahDiputuskan } from "../../config/pengajuan.js";
 import useDetailPengajuan from "../../hooks/useDetailPengajuan.js";
 import { simpanHasilVerifikasi } from "../../services/pengajuanService.js";
@@ -50,14 +51,7 @@ function FormLampiran({ idPengajuan, lampiran, onTersimpan }) {
       <div className="berkas">
         <span className="berkas__ikon">FILE</span>
         <div className="berkas__info"><div className="berkas__nama">{lampiran.namaFile}</div></div>
-        {/* TODO: buka berkas asli setelah RF membuat endpoint dokumen. */}
-        <button
-          type="button"
-          className="berkas__lihat"
-          onClick={() => window.alert("Pratinjau berkas belum tersedia. Menunggu endpoint dokumen dari backend.")}
-        >
-          Lihat
-        </button>
+        <TombolLihatBerkas idPengajuan={idPengajuan} idDokumenPengajuan={lampiran.idDokumen} />
       </div>
 
       <div className="verifikasi-form">
