@@ -41,7 +41,7 @@
 /* Dua kolom yang terisi dari atas ke bawah: kolom kiri penuh dulu, lalu kolom kanan. */
 .dash-bar { column-count: 2; column-gap: 32px; }
 .dash-bar > div { break-inside: avoid; margin-bottom: 22px; }
-.dash-bar__kosong { margin: 0; padding: 52px 0 44px; text-align: center; font-size: 0.85rem; color: var(--s-redup); }
+.dash-bar__kosong { column-span: all; margin: 0; padding: 52px 0 44px; text-align: center; font-size: 0.85rem; color: var(--s-redup); }
 .dash-bar__baris { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 0.75rem; }
 .dash-bar__jumlah { font-weight: 600; }
 .dash-bar__jalur { height: 6px; border-radius: 999px; background: var(--s-latar-lembut); overflow: hidden; }
