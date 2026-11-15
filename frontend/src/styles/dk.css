@@ -162,3 +162,8 @@
   .mhs-app .kartu-form { padding: 24px 20px; }
   .mhs-app .kartu-terkirim { padding: 32px 22px; }
 }
+
+/* ---------- Tambahan form dinamis ---------- */
+.mhs-app .field textarea { width: 100%; min-height: 110px; resize: vertical; line-height: 1.6; }
+.mhs-app .kartu-form > .kotak-info, .mhs-app .grid-form ~ .kotak-info { margin-bottom: 24px; }
+.mhs-app .slot-unggah .berkas-terpilih + .berkas-terpilih { margin-top: 10px; }

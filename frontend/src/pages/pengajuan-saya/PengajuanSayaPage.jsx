@@ -7,7 +7,7 @@ import StatusBadge from "../../components/StatusBadge.jsx";
 import { DAFTAR_STATUS } from "../../config/constants.js";
 import useAmbilData from "../../hooks/useAmbilData.js";
 import { ambilPengajuanSaya } from "../../services/pengajuanMahasiswaService.js";
-import { formatIdPengajuan, formatTanggalPendek } from "../../utils/formatPengajuan.js";
+import { formatTanggalPendek } from "../../utils/formatPengajuan.js";
 
 // PJN-UI01 Pengajuan Saya | PJN-UI02 Pengajuan Saya Tidak Tersedia
 // PJN-UC01 Melihat Riwayat Pengajuan, PJN-UC02 Mencari dan Memfilter Pengajuan Saya
@@ -75,7 +75,7 @@ export default function PengajuanSayaPage() {
               <tbody>
                 {data.map((p) => (
                   <tr key={p.idPengajuan}>
-                    <td>{formatIdPengajuan(p.idPengajuan, p.tanggalPengajuan)}</td>
+                    <td>{p.kodePengajuan}</td>
                     <td>{p.namaLayanan}</td>
                     <td>{formatTanggalPendek(p.tanggalPengajuan)}</td>
                     <td><StatusBadge status={p.statusPengajuan} /></td>

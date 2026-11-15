@@ -3,24 +3,28 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { IkonKalender, IkonPanah } from "../../components/mahasiswa/Icons.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
-import {
-  ATURAN_FILE,
-  DESKRIPSI_DOKUMEN,
-  LABEL_PERAN,
-  PERAN_KEGIATAN,
-  PROGRAM_STUDI
-} from "../../config/formPengajuan.js";
-import { useAuth } from "../../context/AuthContext.jsx";
+import { FORMAT_FILE, kunciIdentitas, petunjukIsian, PROGRAM_STUDI } from "../../config/formPengajuan.js";
 import useAmbilData from "../../hooks/useAmbilData.js";
 import { ambilDataFormPengajuan, kirimPengajuan } from "../../services/pengajuanMahasiswaService.js";
 import { formatBatasMB, formatUkuranMB } from "../../utils/formatPengajuan.js";
 
-// PGJ-UI01 Isi Formulir Pengajuan | PGJ-UI02 Formulir Terisi | PGJ-UI03 Data Tidak Lengkap
+const MB = 1024 * 1024;
+
+// PGJ-UI01 Isi Formulir | PGJ-UI02 Formulir Terisi | PGJ-UI03 Data Tidak Lengkap
 // PGJ-UC01 Mengajukan Layanan Kemahasiswaan
-// Ketiga UI itu adalah kondisi dari satu halaman yang sama.
+// Isi form dibangun dari GET /api/layanan/:id -> rincianFormulir, jadi satu halaman ini
+// melayani semua layanan. Kunci tiap isian = labelTampilan ?? label (sama dengan backend).
+const kunciIsian = (item) => item.labelTampilan ?? item.label;
+
+// aktifJika: { field, nilai: [..] } -> aktif bila isian `field` bernilai salah satu dari `nilai`.
+function kondisiAktif(kondisi, isian) {
+  if (!kondisi) return true;
+  const nilai = isian[kondisi.field];
+  return typeof nilai === "string" && kondisi.nilai.includes(nilai.trim());
+}
+
 export default function FormPengajuanPage() {
   const { idLayanan } = useParams();
-  const { user } = useAuth();
   const { data, memuat, error } = useAmbilData(() => ambilDataFormPengajuan(idLayanan), [idLayanan]);
 
   if (memuat) {
@@ -42,39 +46,50 @@ export default function FormPengajuanPage() {
     );
   }
 
+  if (!data.menerimaPengajuan || !data.rincianFormulir?.length) {
+    // statusFormulir dari backend: "informasi" = layanan tanpa formulir, "ditutup" = formulir ditutup sementara.
+    const hanyaInformasi = data.statusFormulir === "informasi";
+    return (
+      <>
+        <PageHeader
+          judul={data.namaLayanan}
+          deskripsi={hanyaInformasi ? "Layanan ini bersifat informasi dan tidak memerlukan pengajuan formulir." : "Layanan ini sedang tidak menerima pengajuan."}
+        />
+        {data.catatan && <p className="kotak-info">{data.catatan}</p>}
+        {hanyaInformasi && data.informasiLayanan && <p className="kotak-info">{data.informasiLayanan}</p>}
+        <Link to="/layanan" className="tombol tombol--garis">Kembali ke Layanan</Link>
+      </>
+    );
+  }
+
   // `key` memaksa isian dikosongkan jika mahasiswa pindah ke layanan lain.
-  return <IsiFormulir key={idLayanan} layanan={data} emailAkun={user.email} />;
+  return <IsiFormulir key={idLayanan} layanan={data} />;
 }
 
-function IsiFormulir({ layanan, emailAkun }) {
+function IsiFormulir({ layanan }) {
   const navigate = useNavigate();
   const ringkasanRef = useRef(null);
+  const { profil } = layanan;
 
-  const [isian, setIsian] = useState({
-    noHp: "",
-    email: emailAkun ?? "",
-    namaKegiatan: "",
-    lokasiKegiatan: "",
-    peran: "",
-    peranLain: "",
-    tanggalAwal: "",
-    tanggalAkhir: ""
-  });
-  const [berkas, setBerkas] = useState({});            // { [idDokumen]: File }
-  const [galatBerkas, setGalatBerkas] = useState({});  // format/ukuran file salah
-  const [galat, setGalat] = useState({});              // validasi saat kirim
+  const [isian, setIsian] = useState({});             // { [kunci isian]: string }
+  const [berkas, setBerkas] = useState({});           // { [idDokumen]: File[] }
+  const [galatBerkas, setGalatBerkas] = useState({}); // format/ukuran/jumlah file salah
+  const [galat, setGalat] = useState({});             // { [kunci isian]: pesan } saat kirim
   const [dokumenKurang, setDokumenKurang] = useState([]);
+  const [galatServer, setGalatServer] = useState([]); // daftar isian dari respons 400 backend
   const [kirimSalinan, setKirimSalinan] = useState(false);
   const [percobaan, setPercobaan] = useState(0);
   const [pesanGagal, setPesanGagal] = useState("");
   const [mengirim, setMengirim] = useState(false);
 
-  const adaGalat = Object.keys(galat).length > 0 || dokumenKurang.length > 0;
-  // Catatan di panel kanan berubah setelah mahasiswa mulai mengisi (sesuai Figma).
-  const sudahMulai =
-    percobaan > 0 ||
-    Boolean(isian.noHp || isian.namaKegiatan || isian.lokasiKegiatan || isian.peran || isian.tanggalAwal || isian.tanggalAkhir) ||
-    Object.keys(berkas).length > 0;
+  // Kelompok bersyarat (aktifJika) hanya tampil bila kondisinya terpenuhi.
+  const kelompokAktif = layanan.rincianFormulir
+    .map((kelompok, indeks) => ({ ...kelompok, indeks }))
+    .filter((kelompok) => kondisiAktif(kelompok.aktifJika, isian));
+  const lampiranAktif = kelompokAktif.flatMap((k) => k.lampiran ?? []);
+
+  const adaGalat = Object.keys(galat).length > 0 || dokumenKurang.length > 0 || galatServer.length > 0;
+  const sudahMulai = percobaan > 0 || Object.values(isian).some(Boolean) || Object.keys(berkas).length > 0;
 
   // Fokus ke ringkasan galat setiap kali kirim gagal validasi, supaya terbaca pembaca layar.
   useEffect(() => {
@@ -82,83 +97,95 @@ function IsiFormulir({ layanan, emailAkun }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percobaan]);
 
-  function ubah(nama, nilai) {
-    setIsian((lama) => ({ ...lama, [nama]: nilai }));
+  function ubah(kunci, nilai) {
+    setIsian((lama) => ({ ...lama, [kunci]: nilai }));
     setGalat((lama) => {
-      if (!lama[nama]) return lama;
+      if (!lama[kunci]) return lama;
       const baru = { ...lama };
-      delete baru[nama];
+      delete baru[kunci];
       return baru;
     });
   }
 
-  // Atribut umum untuk satu kolom isian.
-  const sifat = (nama) => ({
-    id: nama,
-    value: isian[nama],
-    onChange: (e) => ubah(nama, e.target.value),
-    "aria-invalid": Boolean(galat[nama]),
-    "aria-required": true,
-    "aria-describedby": `petunjuk-${nama}`
-  });
-
-  function pilihBerkas(dok, file) {
-    const aturan = dok.wajib ? ATURAN_FILE.wajib : ATURAN_FILE.opsional;
-    const ekstensi = `.${file.name.split(".").pop().toLowerCase()}`;
+  function pilihBerkas(dok, terpilih) {
+    const diizinkan = FORMAT_FILE[dok.format ?? "PDF"] ?? FORMAT_FILE.PDF;
+    const maksFile = dok.maksimalFile || 1;
+    const maksByte = (dok.maksimalUkuranEfektifMb ?? dok.maksimalUkuranMb ?? 10) * MB;
+    const baru = maksFile === 1 ? [] : [...(berkas[dok.idDokumen] ?? [])];
     let pesan = "";
 
-    if (!aturan.ekstensi.includes(ekstensi)) {
-      pesan = `Format file tidak sesuai. Gunakan file ${aturan.pesanFormat}.`;
-    } else if (file.size > aturan.maksUkuran) {
-      pesan = `Ukuran file ${formatUkuranMB(file.size)} melebihi batas ${formatBatasMB(aturan.maksUkuran)}.`;
+    for (const file of terpilih) {
+      const ekstensi = `.${file.name.split(".").pop().toLowerCase()}`;
+      if (!diizinkan.includes(ekstensi)) {
+        pesan = `Format file tidak sesuai. Gunakan file ${dok.format ?? "PDF"}.`;
+      } else if (file.size < 1) {
+        pesan = "File kosong tidak dapat diunggah.";
+      } else if (file.size > maksByte) {
+        pesan = `Ukuran file ${formatUkuranMB(file.size)} melebihi batas ${formatBatasMB(maksByte)}.`;
+      } else if (baru.length >= maksFile) {
+        pesan = `Jumlah file untuk ${dok.namaDokumen} maksimal ${maksFile}.`;
+      } else {
+        baru.push(file);
+      }
     }
 
     setGalatBerkas((lama) => ({ ...lama, [dok.idDokumen]: pesan }));
-    if (pesan) return;
+    if (!baru.length) return;
 
-    setBerkas((lama) => ({ ...lama, [dok.idDokumen]: file }));
+    setBerkas((lama) => ({ ...lama, [dok.idDokumen]: baru }));
     setDokumenKurang((lama) => lama.filter((d) => d.idDokumen !== dok.idDokumen));
   }
 
-  function hapusBerkas(dok) {
+  function hapusBerkas(dok, file) {
     setBerkas((lama) => {
+      const sisa = (lama[dok.idDokumen] ?? []).filter((f) => f !== file);
       const baru = { ...lama };
-      delete baru[dok.idDokumen];
+      if (sisa.length) baru[dok.idDokumen] = sisa;
+      else delete baru[dok.idDokumen];
       return baru;
     });
     setGalatBerkas((lama) => ({ ...lama, [dok.idDokumen]: "" }));
   }
 
-  // Urutan pesan mengikuti urutan kolom di formulir (sama dengan ringkasan di Figma).
+  // Pesan galat berurutan sesuai urutan kolom di form (sama dengan ringkasan di Figma).
   function validasi() {
     const hasil = {};
-    const wajib = (nama, label) => {
-      if (!String(isian[nama]).trim()) hasil[nama] = `Lengkapi ${label}.`;
-    };
 
-    wajib("noHp", "No. HP");
-    wajib("email", "Email");
-    wajib("namaKegiatan", "Nama Kegiatan/Lomba");
-    wajib("lokasiKegiatan", "Lokasi Kegiatan/Lomba");
-    if (!isian.peran) hasil.peran = "Lengkapi Sebagai.";
-    else if (isian.peran === "Other") wajib("peranLain", "Other response");
-    wajib("tanggalAwal", "Tanggal Awal Pelaksanaan Kegiatan");
-    wajib("tanggalAkhir", "Tanggal Akhir Pelaksanaan Kegiatan");
+    for (const kelompok of kelompokAktif) {
+      for (const item of kelompok.isian) {
+        if (kunciIdentitas(kelompok.judul, item.label)) continue; // diisi backend dari akun
+        if (!kondisiAktif(item.aktifJika, isian)) continue;
 
-    if (isian.email.trim() && !/^\S+@\S+\.\S+$/.test(isian.email.trim())) {
-      hasil.email = "Format Email tidak valid.";
+        const kunci = kunciIsian(item);
+        const nilai = String(isian[kunci] ?? "").trim();
+
+        if (!nilai) {
+          if (item.wajib) hasil[kunci] = `Lengkapi ${kunci}.`;
+        } else if (item.tipe === "Email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nilai)) {
+          hasil[kunci] = `Alamat email pada "${kunci}" tidak valid.`;
+        } else if (item.tipe === "Angka" && !/^\d+$/.test(nilai)) {
+          hasil[kunci] = `Gunakan angka bulat yang valid pada "${kunci}".`;
+        }
+      }
+
+      // Tanggal akhir/selesai tidak boleh sebelum tanggal awal/mulai dalam satu kelompok.
+      const tanggal = kelompok.isian.filter((i) => i.tipe === "Tanggal" && kondisiAktif(i.aktifJika, isian));
+      const awal = tanggal.find((i) => /awal|mulai/i.test(i.label));
+      const akhir = tanggal.find((i) => /akhir|selesai/i.test(i.label));
+      if (awal && akhir && isian[kunciIsian(awal)] && isian[kunciIsian(akhir)] && !hasil[kunciIsian(akhir)]
+        && isian[kunciIsian(akhir)] < isian[kunciIsian(awal)]) {
+        hasil[kunciIsian(akhir)] = `${kunciIsian(akhir)} tidak boleh sebelum ${kunciIsian(awal)}.`;
+      }
     }
-    if (isian.tanggalAwal && isian.tanggalAkhir && isian.tanggalAkhir < isian.tanggalAwal) {
-      hasil.tanggalAkhir = "Tanggal Akhir Pelaksanaan Kegiatan tidak boleh sebelum tanggal awal.";
-    }
 
-    const kurang = layanan.dokumen.filter((d) => d.wajib && !berkas[d.idDokumen]);
+    const kurang = lampiranAktif.filter((d) => d.wajib && !berkas[d.idDokumen]?.length);
     return { hasil, kurang };
   }
 
   async function kirim(event) {
     event.preventDefault();
     setPesanGagal("");
+    setGalatServer([]);
 
     const { hasil, kurang } = validasi();
     setGalat(hasil);
@@ -166,25 +193,41 @@ function IsiFormulir({ layanan, emailAkun }) {
     setPercobaan((n) => n + 1);
     if (Object.keys(hasil).length > 0 || kurang.length > 0) return;
 
+    // Hanya isian dan lampiran milik kelompok aktif yang dikirim.
+    const isianKirim = {};
+    for (const kelompok of kelompokAktif) {
+      for (const item of kelompok.isian) {
+        if (kunciIdentitas(kelompok.judul, item.label) || !kondisiAktif(item.aktifJika, isian)) continue;
+        const nilai = String(isian[kunciIsian(item)] ?? "").trim();
+        if (nilai) isianKirim[kunciIsian(item)] = nilai;
+      }
+    }
+    const berkasKirim = {};
+    for (const dok of lampiranAktif) {
+      if (berkas[dok.idDokumen]?.length) berkasKirim[dok.idDokumen] = berkas[dok.idDokumen];
+    }
+
     setMengirim(true);
     try {
       const { idPengajuan } = await kirimPengajuan({
         idLayanan: layanan.idLayanan,
-        namaLayanan: layanan.namaLayanan,
-        email: isian.email.trim(),
-        isian,
-        berkas,
-        dokumen: layanan.dokumen,
-        kirimSalinan // belum dipakai backend; disiapkan untuk fitur salinan email
+        isian: isianKirim,
+        berkas: berkasKirim,
+        kirimSalinanEmail: layanan.bolehKirimSalinanEmail ? kirimSalinan : undefined
       });
       navigate(`/pengajuan-saya/terkirim/${idPengajuan}`, { replace: true });
     } catch (e) {
       setPesanGagal(e.message || "Pengajuan gagal disimpan. Kirim ulang beberapa saat lagi.");
+      setGalatServer([
+        ...(e.data?.belumDiisi ?? []).map((label) => `Lengkapi ${label}.`),
+        ...(e.data?.dokumenBelumLengkap ?? []).map((d) => `Lampiran wajib belum tersedia: ${d.namaDokumen}.`)
+      ]);
       setMengirim(false);
     }
   }
 
-  const { profil } = layanan;
+  const jumlahWajib = lampiranAktif.filter((d) => d.wajib).length;
+  const jumlahOpsional = lampiranAktif.length - jumlahWajib;
 
   return (
     <>
@@ -195,106 +238,62 @@ function IsiFormulir({ layanan, emailAkun }) {
 
       <div className="grid-form">
         <form onSubmit={kirim} noValidate className="kartu kartu-form">
-          <div className="bagian-judul">
-            <span className="nomor-bagian" aria-hidden="true">01</span>
-            <h2 id="judul-identitas">Identitas dan kontak</h2>
-          </div>
+          {layanan.catatan && <p className="kotak-info">{layanan.catatan}</p>}
 
-          <div className="field">
-            <label htmlFor="namaMahasiswa" className="field__label">Nama Pengaju <span className="tanda-wajib" aria-hidden="true">*</span></label>
-            <input id="namaMahasiswa" value={profil.namaMahasiswa} readOnly />
-          </div>
-          <div className="field">
-            <label htmlFor="nim" className="field__label">NIM Pengaju <span className="tanda-wajib" aria-hidden="true">*</span></label>
-            <input id="nim" value={profil.nim} readOnly />
-          </div>
+          {kelompokAktif.map((kelompok, urutan) => (
+            <section key={kelompok.indeks} aria-labelledby={`judul-kelompok-${kelompok.indeks}`}>
+              {urutan > 0 && <hr className="pemisah-bagian" />}
+              <div className="bagian-judul">
+                <span className="nomor-bagian" aria-hidden="true">{String(urutan + 1).padStart(2, "0")}</span>
+                <h2 id={`judul-kelompok-${kelompok.indeks}`}>{kelompok.judul}</h2>
+              </div>
 
-          <fieldset className="grup-pilihan" disabled>
-            <legend>Asal Prodi <span className="tanda-wajib" aria-hidden="true">*</span></legend>
-            <div className="grup-pilihan__daftar">
-              {PROGRAM_STUDI.map((prodi) => (
-                <label key={prodi} className="pilihan">
-                  <input type="radio" name="prodi" value={prodi} checked={profil.programStudi === prodi} readOnly />
-                  {prodi}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <Isian label="No. HP" nama="noHp" petunjuk="Cantumkan nomor WhatsApp yang aktif.">
-            <input type="tel" inputMode="tel" autoComplete="tel" {...sifat("noHp")} />
-          </Isian>
-          <Isian label="Email" nama="email" petunjuk="Cantumkan email UB yang aktif.">
-            <input type="email" autoComplete="email" {...sifat("email")} />
-          </Isian>
-
-          <hr className="pemisah-bagian" />
-
-          <div className="bagian-judul">
-            <span className="nomor-bagian" aria-hidden="true">02</span>
-            <h2 id="judul-kegiatan">Detil kegiatan / lomba</h2>
-          </div>
-
-          <Isian label="Nama Kegiatan/Lomba" nama="namaKegiatan">
-            <input {...sifat("namaKegiatan")} />
-          </Isian>
-
-          <Isian label="Lokasi Kegiatan/Lomba" nama="lokasiKegiatan" petunjuk="Nama tempat / kota / negara pelaksanaan kegiatan.">
-            <input {...sifat("lokasiKegiatan")} />
-          </Isian>
-
-          <fieldset className="grup-pilihan" aria-describedby="petunjuk-peran">
-            <legend>Sebagai <span className="tanda-wajib" aria-hidden="true">*</span></legend>
-            <div className="grup-pilihan__daftar" aria-invalid={Boolean(galat.peran)}>
-              {PERAN_KEGIATAN.map((peran) => (
-                <label key={peran} className="pilihan">
-                  <input
-                    type="radio" name="peran" value={peran}
-                    checked={isian.peran === peran} onChange={() => ubah("peran", peran)}
+              {kelompok.isian.map((item, i) => {
+                if (!kondisiAktif(item.aktifJika, isian)) return null;
+                const kunci = kunciIsian(item);
+                const kunciProfil = kunciIdentitas(kelompok.judul, item.label);
+                return (
+                  <KolomIsian
+                    key={`${kelompok.indeks}-${i}`}
+                    id={`f-${kelompok.indeks}-${i}`}
+                    item={item}
+                    label={kunci}
+                    nilai={kunciProfil ? profil[kunciProfil] ?? "" : isian[kunci] ?? ""}
+                    otomatis={Boolean(kunciProfil)}
+                    galat={Boolean(galat[kunci])}
+                    onUbah={(nilai) => ubah(kunci, nilai)}
                   />
-                  {LABEL_PERAN[peran] ?? peran}
-                </label>
+                );
+              })}
+
+              {(kelompok.lampiran ?? []).map((dok) => (
+                <SlotUnggah
+                  key={dok.idDokumen}
+                  dok={dok}
+                  daftarFile={berkas[dok.idDokumen] ?? []}
+                  galat={galatBerkas[dok.idDokumen]}
+                  belumDiunggah={dokumenKurang.some((d) => d.idDokumen === dok.idDokumen)}
+                  onPilih={(files) => pilihBerkas(dok, files)}
+                  onHapus={(file) => hapusBerkas(dok, file)}
+                />
               ))}
-            </div>
-            <span id="petunjuk-peran" className="sr-only">Pilih salah satu peran.</span>
-          </fieldset>
-
-          {isian.peran === "Other" && (
-            <Isian label="Other response" nama="peranLain" petunjuk="Isi pilihan lainnya.">
-              <input {...sifat("peranLain")} />
-            </Isian>
-          )}
-
-          <Isian label="Tanggal Awal Pelaksanaan Kegiatan" nama="tanggalAwal">
-            <InputTanggal {...sifat("tanggalAwal")} />
-          </Isian>
-          <Isian label="Tanggal Akhir Pelaksanaan Kegiatan" nama="tanggalAkhir">
-            <InputTanggal {...sifat("tanggalAkhir")} min={isian.tanggalAwal || undefined} />
-          </Isian>
-
-          {layanan.dokumen.map((dok) => (
-            <SlotUnggah
-              key={dok.idDokumen}
-              dok={dok}
-              file={berkas[dok.idDokumen]}
-              galat={galatBerkas[dok.idDokumen]}
-              belumDiunggah={dokumenKurang.some((d) => d.idDokumen === dok.idDokumen)}
-              onPilih={(file) => pilihBerkas(dok, file)}
-              onHapus={() => hapusBerkas(dok)}
-            />
+            </section>
           ))}
 
-          <label className="kotak-centang">
-            <input type="checkbox" checked={kirimSalinan} onChange={(e) => setKirimSalinan(e.target.checked)} />
-            <span>Kirim salinan jawaban ke email saya {kirimSalinan && <small>(simulasi)</small>}</span>
-          </label>
+          {layanan.bolehKirimSalinanEmail && (
+            <label className="kotak-centang">
+              <input type="checkbox" checked={kirimSalinan} onChange={(e) => setKirimSalinan(e.target.checked)} />
+              <span>Kirim salinan jawaban ke email saya</span>
+            </label>
+          )}
 
           {adaGalat && (
             <div className="ringkasan-galat" role="alert" tabIndex={-1} ref={ringkasanRef}>
               <strong>Periksa kembali formulir</strong>
               <ul>
-                {Object.entries(galat).map(([nama, pesan]) => <li key={nama}>{pesan}</li>)}
+                {Object.entries(galat).map(([kunci, pesan]) => <li key={kunci}>{pesan}</li>)}
                 {dokumenKurang.map((d) => <li key={d.idDokumen}>Lampiran wajib belum tersedia: {d.namaDokumen}.</li>)}
+                {galatServer.map((pesan) => <li key={pesan}>{pesan}</li>)}
               </ul>
             </div>
           )}
@@ -313,16 +312,18 @@ function IsiFormulir({ layanan, emailAkun }) {
           <span className="eyebrow">Layanan dipilih</span>
           <h2 id="judul-layanan">{layanan.namaLayanan}</h2>
           <ol className="langkah-form">
-            <li><span>01</span>Identitas dan kontak</li>
-            <li><span>02</span>Detil kegiatan / lomba</li>
+            {kelompokAktif.map((kelompok, urutan) => (
+              <li key={kelompok.indeks}><span>{String(urutan + 1).padStart(2, "0")}</span>{kelompok.judul}</li>
+            ))}
           </ol>
-          <div className="kotak-info">
-            {layanan.dokumen.filter((d) => d.wajib).length} jenis lampiran wajib,{" "}
-            {layanan.dokumen.filter((d) => !d.wajib).length} opsional. Perhatikan jenis file, jumlah, dan ukuran pada setiap unggahan.
-          </div>
+          {lampiranAktif.length > 0 && (
+            <div className="kotak-info">
+              {jumlahWajib} jenis lampiran wajib, {jumlahOpsional} opsional. Perhatikan jenis file, jumlah, dan ukuran pada setiap unggahan.
+            </div>
+          )}
           <p className="catatan">
             {sudahMulai
-              ? "Data dan file hanya digunakan selama sesi prototipe ini. Gunakan data contoh; formulir tidak terhubung ke layanan FILKOM."
+              ? "Pengajuan akan dikirim ke kemahasiswaan FILKOM dan tidak dapat diubah setelah terkirim. Periksa kembali isian dan lampiran."
               : "Pastikan seluruh data dan lampiran sudah benar sebelum mengirim formulir."}
           </p>
         </aside>
@@ -331,18 +332,61 @@ function IsiFormulir({ layanan, emailAkun }) {
   );
 }
 
-// Pembungkus label + petunjuk untuk satu kolom isian.
-function Isian({ label, nama, petunjuk, children }) {
+// Satu kolom isian; bentuknya mengikuti item.tipe dari backend.
+function KolomIsian({ id, item, label, nilai, otomatis, galat, onUbah }) {
+  const petunjuk = petunjukIsian(label);
+  const sifat = {
+    id,
+    "aria-invalid": galat,
+    "aria-required": item.wajib,
+    "aria-describedby": `petunjuk-${id}`,
+    maxLength: 5000 // batas isian di backend (validasiFormulir)
+  };
+
+  // Pilihan dengan daftar opsi tampil sebagai kartu radio; tanpa daftar opsi menjadi isian bebas.
+  const adaOpsi = item.tipe === "Pilihan" && (item.pilihan?.length || otomatis);
+
+  if (adaOpsi) {
+    const opsi = otomatis ? PROGRAM_STUDI : item.pilihan;
+    return (
+      <fieldset className="grup-pilihan" disabled={otomatis} aria-describedby={`petunjuk-${id}`}>
+        <legend>{label} {item.wajib && <span className="tanda-wajib" aria-hidden="true">*</span>}</legend>
+        <div className="grup-pilihan__daftar" aria-invalid={galat}>
+          {opsi.map((pilihan) => (
+            <label key={pilihan} className="pilihan">
+              <input
+                type="radio" name={id} value={pilihan}
+                checked={nilai === pilihan} onChange={() => onUbah(pilihan)}
+              />
+              {pilihan}
+            </label>
+          ))}
+        </div>
+        <span id={`petunjuk-${id}`} className={petunjuk ? "field__petunjuk" : "sr-only"}>{petunjuk ?? ""}</span>
+      </fieldset>
+    );
+  }
+
+  let kontrol;
+  if (otomatis) {
+    kontrol = <input id={id} value={nilai} readOnly aria-describedby={`petunjuk-${id}`} />;
+  } else if (item.tipe === "Isian panjang") {
+    kontrol = <textarea rows={4} {...sifat} value={nilai} onChange={(e) => onUbah(e.target.value)} />;
+  } else if (item.tipe === "Tanggal") {
+    kontrol = <InputTanggal {...sifat} value={nilai} onChange={(e) => onUbah(e.target.value)} />;
+  } else {
+    const jenis = { Email: { type: "email", autoComplete: "email" }, Angka: { type: "text", inputMode: "numeric" } }[item.tipe] ?? {};
+    kontrol = <input {...jenis} {...sifat} value={nilai} onChange={(e) => onUbah(e.target.value)} />;
+  }
+
   return (
     <div className="field">
-      <label htmlFor={nama} className="field__label">
-        {label} <span className="tanda-wajib" aria-hidden="true">*</span>
+      <label htmlFor={id} className="field__label">
+        {label} {item.wajib && <span className="tanda-wajib" aria-hidden="true">*</span>}
       </label>
       {/* Id petunjuk selalu ada karena dipakai aria-describedby. */}
-      <small id={`petunjuk-${nama}`} className={petunjuk ? "field__petunjuk" : "sr-only"}>
-        {petunjuk ?? ""}
-      </small>
-      {children}
+      <small id={`petunjuk-${id}`} className={petunjuk ? "field__petunjuk" : "sr-only"}>{petunjuk ?? ""}</small>
+      {kontrol}
     </div>
   );
 }
@@ -380,15 +424,16 @@ function InputTanggal({ value, min, ...sisa }) {
   );
 }
 
-function SlotUnggah({ dok, file, galat, belumDiunggah, onPilih, onHapus }) {
+function SlotUnggah({ dok, daftarFile, galat, belumDiunggah, onPilih, onHapus }) {
   const [versi, setVersi] = useState(0); // mengosongkan input file setelah dipilih
-  const aturan = dok.wajib ? ATURAN_FILE.wajib : ATURAN_FILE.opsional;
+  const maksFile = dok.maksimalFile || 1;
   const idInput = `berkas-${dok.idDokumen}`;
-  const deskripsi = DESKRIPSI_DOKUMEN[dok.idDokumen];
+  const diizinkan = FORMAT_FILE[dok.format ?? "PDF"] ?? FORMAT_FILE.PDF;
+  const bisaTambah = maksFile === 1 || daftarFile.length < maksFile;
 
   function saatDipilih(event) {
-    const terpilih = event.target.files?.[0];
-    if (terpilih) onPilih(terpilih);
+    const terpilih = Array.from(event.target.files ?? []);
+    if (terpilih.length) onPilih(terpilih);
     setVersi((v) => v + 1);
   }
 
@@ -401,27 +446,33 @@ function SlotUnggah({ dok, file, galat, belumDiunggah, onPilih, onHapus }) {
         </span>
         <span className="badge badge--netral">{dok.wajib ? "Wajib" : "Opsional"}</span>
       </div>
-      {deskripsi && <p>{deskripsi}</p>}
-      <p>{aturan.label} · 1 file · maksimal {formatBatasMB(aturan.maksUkuran)} per file</p>
+      {dok.petunjukUnggahan && <p>{dok.petunjukUnggahan}</p>}
+      {dok.ketentuanUnggahan && <p>{dok.ketentuanUnggahan}</p>}
 
-      {file && (
-        <div className="berkas-terpilih">
+      {daftarFile.map((file) => (
+        <div key={`${file.name}-${file.size}-${file.lastModified}`} className="berkas-terpilih">
           <span className="berkas__ikon" aria-hidden="true">FILE</span>
           <span className="berkas__info">
             <span className="berkas__nama">{file.name}</span>
             <span className="berkas__ket">{formatUkuranMB(file.size)}</span>
           </span>
-          <button type="button" className="tautan-teks" onClick={onHapus} aria-label={`Hapus ${file.name}`}>Hapus</button>
+          <button type="button" className="tautan-teks" onClick={() => onHapus(file)} aria-label={`Hapus ${file.name}`}>Hapus</button>
         </div>
-      )}
+      ))}
 
-      <label htmlFor={idInput} className="slot-unggah__label">{file ? "Ganti file" : "Pilih file"}</label>
-      <input
-        key={versi} id={idInput} type="file"
-        accept={aturan.ekstensi.join(",")} onChange={saatDipilih}
-        aria-invalid={Boolean(belumDiunggah || galat)}
-        aria-required={dok.wajib}
-      />
+      {bisaTambah && (
+        <>
+          <label htmlFor={idInput} className="slot-unggah__label">
+            {daftarFile.length === 0 ? "Pilih file" : maksFile === 1 ? "Ganti file" : "Tambah file"}
+          </label>
+          <input
+            key={versi} id={idInput} type="file" multiple={maksFile > 1}
+            accept={diizinkan.join(",")} onChange={saatDipilih}
+            aria-invalid={Boolean(belumDiunggah || galat)}
+            aria-required={dok.wajib}
+          />
+        </>
+      )}
       {galat && <p className="field__galat" role="alert" style={{ marginTop: 8 }}>{galat}</p>}
     </div>
   );

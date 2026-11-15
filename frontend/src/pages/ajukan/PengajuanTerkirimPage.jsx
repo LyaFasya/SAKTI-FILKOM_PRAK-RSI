@@ -5,7 +5,6 @@ import { IkonCentang } from "../../components/mahasiswa/Icons.jsx";
 import StatusBadge from "../../components/StatusBadge.jsx";
 import useAmbilData from "../../hooks/useAmbilData.js";
 import { ambilDetailPengajuanSaya } from "../../services/pengajuanMahasiswaService.js";
-import { formatIdPengajuan } from "../../utils/formatPengajuan.js";
 
 // PGJ-UI04 Pengajuan Terkirim | konfirmasi setelah PGJ-UC01
 export default function PengajuanTerkirimPage() {
@@ -21,10 +20,10 @@ export default function PengajuanTerkirimPage() {
       <div className="ikon-berhasil"><IkonCentang ukuran={22} /></div>
       <span className="eyebrow" role="status">Berhasil terkirim</span>
       <h1 id="judul-konfirmasi">Pengajuanmu sudah masuk!</h1>
-      <p>Isian dan lampiran tersimpan dalam sesi prototipe ini. Pengiriman ke layanan FILKOM disimulasikan.</p>
+      <p>Pengajuan sudah tersimpan dan menunggu verifikasi kemahasiswaan. Pantau perkembangannya di halaman Pengajuan Saya.</p>
 
       <div className="kotak-id">
-        <strong>{formatIdPengajuan(p.idPengajuan, p.tanggalPengajuan)}</strong>
+        <strong>{p.kodePengajuan}</strong>
         <span>{p.namaLayanan}</span>
       </div>
 

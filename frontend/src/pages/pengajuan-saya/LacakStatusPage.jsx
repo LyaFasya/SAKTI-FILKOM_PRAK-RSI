@@ -8,7 +8,7 @@ import StatusBadge from "../../components/StatusBadge.jsx";
 import { STATUS_PENGAJUAN } from "../../config/constants.js";
 import useAmbilData from "../../hooks/useAmbilData.js";
 import { ambilDetailPengajuanSaya } from "../../services/pengajuanMahasiswaService.js";
-import { formatIdPengajuan, formatTanggalWaktu } from "../../utils/formatPengajuan.js";
+import { formatTanggalWaktu } from "../../utils/formatPengajuan.js";
 
 // Kartu kanan untuk status yang belum menghasilkan dokumen (Menunggu Verifikasi, Diproses, Ditolak).
 const KARTU_TAHAP = {
@@ -46,7 +46,7 @@ export default function LacakStatusPage() {
       <div className="grid-detail">
         <section className="kartu" aria-labelledby="judul-riwayat">
           <div className="kepala-lacak">
-            <h2 id="judul-riwayat">{formatIdPengajuan(p.idPengajuan, p.tanggalPengajuan)}</h2>
+            <h2 id="judul-riwayat">{p.kodePengajuan}</h2>
             <StatusBadge status={p.statusPengajuan} />
           </div>
           <p className="layanan-lacak teks-redup">{p.namaLayanan}</p>
@@ -74,7 +74,7 @@ export default function LacakStatusPage() {
         </section>
 
         {disetujui ? (
-          <BerkasHasil dokumenHasil={p.dokumenHasil} email={p.identitas.email} />
+          <BerkasHasil idPengajuan={p.idPengajuan} dokumenHasil={p.dokumenHasil} email={p.identitas.email} />
         ) : (
           <section className="kartu kartu--info" aria-labelledby="judul-tahap">
             <span className="kotak-ikon"><IkonHati ukuran={20} /></span>

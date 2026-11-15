@@ -1,147 +1,149 @@
-// Service pengajuan sisi MAHASISWA (milik DK). Terpisah dari pengajuanService.js
-// yang dipakai halaman staf, supaya tidak bentrok saat merge.
+// Service pengajuan sisi MAHASISWA (milik DK), memanggil API asli backend:
+//   GET  /api/pengajuan/profil             GET  /api/pengajuan?kataKunci=&statusPengajuan=
+//   GET  /api/layanan/:id                  GET  /api/pengajuan/:id
+//   POST /api/pengajuan (multipart)        GET  /api/pengajuan/:id/dokumen-hasil
+//   GET  /api/notifikasi
+// Autentikasi memakai session cookie, dikirim otomatis oleh browser lewat proxy Vite.
 //
-// Status backend:
-// - ambilDataFormPengajuan: memakai API asli layanan (GET /api/layanan/:id/persyaratan)
-//   + profil mahasiswa dummy (belum ada endpoint profil).
-// - fungsi lainnya masih DATA DUMMY di memori. Saat endpoint RF sudah ada,
-//   ganti isi fungsi dengan apiRequest(...). Halaman tidak perlu diubah.
-import { STATUS_PENGAJUAN } from "../config/constants.js";
-import { notifikasiDummy, pengajuanSayaDummy, profilDummy } from "../mocks/pengajuanMahasiswa.js";
-import { formatIdPengajuan } from "../utils/formatPengajuan.js";
-import { ambilPersyaratanLayanan } from "./layananService.js";
+// Pengiriman pengajuan memakai fetch sendiri karena apiRequest di api.js belum
+// mendukung FormData. Kalau api.js nanti mendukungnya, bagian itu bisa diganti apiRequest.
+import { ApiError, apiRequest, hapusSesi } from "./api.js";
+import { adalahNomorHp, kunciIdentitas } from "../config/formPengajuan.js";
 
-const tunda = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Salinan data di memori supaya pengajuan baru langsung muncul di daftar
-// selama halaman belum di-refresh.
-let daftarPengajuan = structuredClone(pengajuanSayaDummy);
-let daftarNotifikasi = structuredClone(notifikasiDummy);
-
-function sekarang() {
-  const d = new Date();
-  const dua = (n) => String(n).padStart(2, "0");
-  return {
-    tanggal: `${d.getFullYear()}-${dua(d.getMonth() + 1)}-${dua(d.getDate())}`,
-    waktu: `${dua(d.getHours())}:${dua(d.getMinutes())}:${dua(d.getSeconds())}`
-  };
+// Untuk halaman yang membuka satu pengajuan: ID tidak valid atau bukan milik mahasiswa = tidak ditemukan.
+async function nullJikaTidakAda(ambil) {
+  try {
+    return await ambil();
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 400 || e.status === 404)) return null;
+    throw e;
+  }
 }
 
-// PGJ-UI01: data untuk menampilkan formulir pengajuan.
-// Jika layanan belum punya DokumenPersyaratan di database, dipakai dua slot
-// bawaan sesuai sketsa: Data Lampiran (wajib) dan Data Pendukung (opsional).
+// { nim, namaMahasiswa, programStudi, email }
+export async function ambilProfil() {
+  const hasil = await apiRequest("/pengajuan/profil");
+  return hasil.data;
+}
+
+// Data form: rincian layanan + profil mahasiswa (untuk mengisi kolom identitas).
 export async function ambilDataFormPengajuan(idLayanan) {
-  const layanan = await ambilPersyaratanLayanan(idLayanan);
-  await tunda(100);
+  const [layanan, profil] = await Promise.all([
+    apiRequest(`/layanan/${idLayanan}`).then((h) => h.data),
+    ambilProfil()
+  ]);
+  return { ...layanan, profil };
+}
 
-  const dokumen = layanan.dokumenPersyaratan?.length
-    ? layanan.dokumenPersyaratan.map((d) => ({
-        idDokumen: d.idDokumen,
-        namaDokumen: d.namaDokumen,
-        wajib: Boolean(d.wajib)
-      }))
-    : [
-        { idDokumen: "lampiran", namaDokumen: "Unggah Data Lampiran", wajib: true },
-        { idDokumen: "pendukung", namaDokumen: "Unggah Data Pendukung", wajib: false }
-      ];
+// `isian`  = { [label isian]: nilai }   (kunci = labelTampilan ?? label dari rincianFormulir)
+// `berkas` = { [idDokumen]: File[] }
+// Mengembalikan { idPengajuan, kodePengajuan, tanggalPengajuan, statusPengajuan, ... }.
+export async function kirimPengajuan({ idLayanan, isian, berkas, kirimSalinanEmail }) {
+  const form = new FormData();
+  form.append("idLayanan", String(idLayanan));
+  form.append("isianFormulir", JSON.stringify(isian));
+  if (kirimSalinanEmail !== undefined) form.append("kirimSalinanEmail", String(kirimSalinanEmail));
+  for (const [idDokumen, daftarFile] of Object.entries(berkas)) {
+    for (const file of daftarFile) form.append(`lampiran[${idDokumen}]`, file, file.name);
+  }
 
+  let respons;
+  try {
+    respons = await fetch("/api/pengajuan", { method: "POST", body: form });
+  } catch {
+    throw new ApiError("Tidak dapat terhubung ke server. Pastikan backend sudah berjalan.", 0, null);
+  }
+
+  const data = await respons.json().catch(() => null);
+
+  if (respons.status === 401) {
+    hapusSesi();
+    window.dispatchEvent(new Event("sakti:unauthorized"));
+  }
+  if (!respons.ok) {
+    throw new ApiError(data?.message ?? "Pengajuan gagal dikirim.", respons.status, data);
+  }
+  return data.data;
+}
+
+// [{ idPengajuan, kodePengajuan, idLayanan, namaLayanan, tanggalPengajuan, statusPengajuan }]
+// Backend mengurutkan dari yang terbaru.
+export async function ambilPengajuanSaya({ status = "", kataKunci = "" } = {}) {
+  const params = new URLSearchParams();
+  if (kataKunci.trim()) params.set("kataKunci", kataKunci.trim());
+  if (status) params.set("statusPengajuan", status);
+  const query = params.toString();
+  const hasil = await apiRequest(`/pengajuan${query ? `?${query}` : ""}`);
+  return hasil.data;
+}
+
+// Isian yang dikirim mahasiswa, berurutan sesuai kelompok di form. Hanya isian yang sudah
+// tampil di bagian "Identitas mahasiswa" (nama, NIM, prodi, email, nomor HP) yang dilewati;
+// isian lain di kelompok yang sama (misalnya "Data alumni") tetap ditampilkan.
+async function susunIsianFormulir(detail) {
+  const isian = detail.isianFormulir;
+  if (!isian || Object.keys(isian).length === 0) return null;
+
+  try {
+    const { data: layanan } = await apiRequest(`/layanan/${detail.idLayanan}`);
+    const hasil = [];
+
+    for (const kelompok of layanan.rincianFormulir ?? []) {
+      for (const item of kelompok.isian) {
+        if (kunciIdentitas(kelompok.judul, item.label) || adalahNomorHp(item.label)) continue;
+        const label = item.labelTampilan ?? item.label;
+        if (Object.hasOwn(isian, label)) hasil.push({ label, nilai: isian[label] });
+      }
+    }
+    return hasil.length ? hasil : null;
+  } catch {
+    // Rincian layanan gagal diambil: tampilkan apa adanya.
+    return Object.entries(isian).map(([label, nilai]) => ({ label, nilai }));
+  }
+}
+
+// Detail satu pengajuan milik mahasiswa; null jika tidak ada. Dipakai halaman Detail,
+// Lacak Status, dan Pengajuan Terkirim.
+export async function ambilDetailPengajuanSaya(idPengajuan) {
+  const detail = await nullJikaTidakAda(async () => (await apiRequest(`/pengajuan/${idPengajuan}`)).data);
+  if (!detail) return null;
+
+  const m = detail.mahasiswa;
   return {
-    idLayanan: layanan.idLayanan,
-    namaLayanan: layanan.namaLayanan,
-    informasiLayanan: layanan.informasiLayanan,
-    persyaratan: (layanan.persyaratan ?? []).map((p) => p.deskripsiPersyaratan),
-    dokumen,
-    profil: profilDummy
+    idPengajuan: detail.idPengajuan,
+    kodePengajuan: detail.kodePengajuan,
+    idLayanan: detail.idLayanan,
+    namaLayanan: detail.namaLayanan,
+    tanggalPengajuan: detail.tanggalPengajuan,
+    statusPengajuan: detail.statusPengajuan,
+    alasanPenolakan: detail.alasanPenolakan,
+    identitas: {
+      namaMahasiswa: m?.namaMahasiswa ?? "-",
+      nim: m?.nim ?? "-",
+      programStudi: m?.programStudi ?? "-",
+      email: m?.email ?? "-",
+      noHp: m?.nomorHp ?? ""
+    },
+    formulir: await susunIsianFormulir(detail), // [{ label, nilai }] atau null
+    dokumen: (detail.lampiran ?? []).map((l) => ({
+      idDokumenPengajuan: l.idDokumenPengajuan,
+      namaDokumen: l.dokumenPersyaratan?.namaDokumen ?? "Lampiran",
+      namaFile: l.namaFile,
+      statusDokumen: l.statusDokumen
+    })),
+    riwayat: detail.riwayatStatus ?? [],
+    dokumenHasil: detail.dokumenHasil // { idDokumenHasil, namaDokumen, tanggalUpload } atau null
   };
 }
 
-// PGJ-UC01: kirim pengajuan. `berkas` = { [idDokumen]: File }.
-// Nanti: kirim sebagai multipart/form-data (api.js saat ini hanya mengirim JSON,
-// jadi perlu dukungan FormData; kabari grup karena api.js file bersama).
-export async function kirimPengajuan({ idLayanan, namaLayanan, isian, berkas, dokumen, email }) {
-  await tunda(500);
-
-  const { tanggal, waktu } = sekarang();
-  const idBaru = Math.max(0, ...daftarPengajuan.map((p) => p.idPengajuan)) + 1;
-
-  daftarPengajuan = [
-    ...daftarPengajuan,
-    {
-      idPengajuan: idBaru,
-      idLayanan: Number(idLayanan),
-      namaLayanan,
-      tanggalPengajuan: tanggal,
-      statusPengajuan: STATUS_PENGAJUAN.MENUNGGU_VERIFIKASI,
-      alasanPenolakan: null,
-      identitas: { ...profilDummy, email, noHp: isian.noHp },
-      formulir: {
-        namaKegiatan: isian.namaKegiatan,
-        lokasiKegiatan: isian.lokasiKegiatan,
-        peran: isian.peran,
-        peranLain: isian.peran === "Other" ? isian.peranLain.trim() : null,
-        tanggalAwal: isian.tanggalAwal,
-        tanggalAkhir: isian.tanggalAkhir
-      },
-      dokumen: dokumen
-        .filter((d) => berkas[d.idDokumen])
-        .map((d) => ({
-          namaDokumen: d.namaDokumen,
-          namaFile: berkas[d.idDokumen].name,
-          // Hanya berlaku selama halaman belum di-refresh. Backend nanti memberi URL unduhan.
-          urlFile: URL.createObjectURL(berkas[d.idDokumen]),
-          statusDokumen: "Belum Diverifikasi"
-        })),
-      riwayat: [{ statusPengajuan: STATUS_PENGAJUAN.MENUNGGU_VERIFIKASI, tanggalStatus: tanggal, waktuStatus: waktu }],
-      dokumenHasil: null
-    }
-  ];
-
-  daftarNotifikasi = [
-    {
-      idNotifikasi: daftarNotifikasi.length + 1,
-      idPengajuan: idBaru,
-      pesan: `Pengajuan ${formatIdPengajuan(idBaru, tanggal)} diterima dan menunggu verifikasi.`,
-      statusPengajuan: STATUS_PENGAJUAN.MENUNGGU_VERIFIKASI,
-      tanggalPerubahan: tanggal,
-      waktuPerubahan: waktu,
-      statusPengirimanEmail: "Berhasil",
-      keteranganEmail: null
-    },
-    ...daftarNotifikasi
-  ];
-
-  return { idPengajuan: idBaru };
+// Tautan unduhan dokumen hasil (signed URL, berlaku 120 detik).
+export async function ambilUrlDokumenHasil(idPengajuan) {
+  const hasil = await apiRequest(`/pengajuan/${idPengajuan}/dokumen-hasil`);
+  return hasil.data.url;
 }
 
-// PJN-UC01 dan PJN-UC02: riwayat pengajuan milik mahasiswa + cari + filter status.
-export async function ambilPengajuanSaya({ status, kataKunci } = {}) {
-  await tunda();
-  const kunci = kataKunci?.trim().toLowerCase();
-
-  return daftarPengajuan
-    .filter((p) => {
-      if (status && p.statusPengajuan !== status) return false;
-      if (kunci) {
-        const gudang = `${formatIdPengajuan(p.idPengajuan, p.tanggalPengajuan)} ${p.idPengajuan} ${p.namaLayanan}`.toLowerCase();
-        if (!gudang.includes(kunci)) return false;
-      }
-      return true;
-    })
-    .sort((a, b) => b.idPengajuan - a.idPengajuan);
-}
-
-// PJN-UC03 sampai PJN-UC06: detail satu pengajuan (identitas, isian, lampiran,
-// riwayat status, alasan penolakan, dokumen hasil). Mengembalikan null jika tidak ada.
-export async function ambilDetailPengajuanSaya(idPengajuan) {
-  await tunda();
-  return daftarPengajuan.find((p) => p.idPengajuan === Number(idPengajuan)) ?? null;
-}
-
-// PJN-UC07: notifikasi perubahan status, terbaru di atas.
+// [{ idNotifikasi, idPengajuan, kodePengajuan, namaLayanan, pesan, statusPengajuan, tanggalPerubahan, waktuPerubahan }]
 export async function ambilNotifikasi() {
-  await tunda();
-  const namaLayanan = (id) => daftarPengajuan.find((p) => p.idPengajuan === id)?.namaLayanan ?? "";
-  return daftarNotifikasi.map((n) => ({ ...n, namaLayanan: namaLayanan(n.idPengajuan) })).sort((a, b) =>
-    `${b.tanggalPerubahan}${b.waktuPerubahan}`.localeCompare(`${a.tanggalPerubahan}${a.waktuPerubahan}`)
-  );
+  const hasil = await apiRequest("/notifikasi");
+  return hasil.data;
 }

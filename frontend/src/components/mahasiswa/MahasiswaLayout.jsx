@@ -2,7 +2,8 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import logoFilkom from "../../assets/logo-filkom.png";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { profilDummy } from "../../mocks/pengajuanMahasiswa.js";
+import useAmbilData from "../../hooks/useAmbilData.js";
+import { ambilProfil } from "../../services/pengajuanMahasiswaService.js";
 import "../../styles/mahasiswa-theme.css";
 import { IkonDokumen, IkonKeluar, IkonLayanan, IkonLonceng, IkonTopi } from "./Icons.jsx";
 
@@ -32,8 +33,9 @@ export default function MahasiswaLayout() {
   const { pathname } = useLocation();
   const labelHalaman = POLA_HALAMAN.find(([pola]) => pola.test(pathname))?.[1];
 
-  // Backend belum mengirim nama dan prodi saat login, jadi diambil dari profil dummy.
-  const kata = profilDummy.namaMahasiswa.split(" ");
+  // Nama dan prodi dari GET /api/pengajuan/profil (khusus akun mahasiswa).
+  const { data: profil } = useAmbilData(() => ambilProfil(), []);
+  const kata = (profil?.namaMahasiswa ?? "").split(" ").filter(Boolean);
   const namaSingkat = kata.slice(0, 2).join(" ");
   const inisial = kata.slice(0, 2).map((k) => k[0]).join("").toUpperCase();
 
@@ -64,7 +66,7 @@ export default function MahasiswaLayout() {
             <span className="mhs-profil__avatar" aria-hidden="true">{inisial}</span>
             <div className="mhs-profil__teks">
               <div className="mhs-profil__nama">{namaSingkat}</div>
-              <div className="mhs-profil__peran">Mahasiswa · {profilDummy.programStudi}</div>
+              <div className="mhs-profil__peran">Mahasiswa{profil ? ` · ${profil.programStudi}` : ""}</div>
             </div>
             <button type="button" className="mhs-keluar" onClick={logout} aria-label="Keluar">
               <IkonKeluar ukuran={18} />
