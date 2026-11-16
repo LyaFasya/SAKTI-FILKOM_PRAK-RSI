@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -7,6 +7,7 @@ import "./LoginPage.css";
 import bannerImg from "../../assets/Section kiri login.png";
 import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
 
+// LGN-UI01
 export default function LoginPage() {
   const [nimEmail, setNimEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -126,12 +127,12 @@ export default function LoginPage() {
               disabled={sedangMasuk}
             >
               <span>{sedangMasuk ? "Memproses..." : "Masuk ke portal"}</span>
-              <span>→</span>
+              <span>â†’</span>
             </button>
           </form>
 
           <div className="security-notice">
-            <div className="check-icon">✓</div>
+            <div className="check-icon">âœ“</div>
             <div className="security-text">
               <strong>Akses aman dan terpusat</strong>
               <p>Gunakan akun kampus yang sesuai untuk melanjutkan.</p>
@@ -149,7 +150,7 @@ export default function LoginPage() {
             </div>
 
             <p className="copyright">
-              © 2026 SAKTI FILKOM · Universitas Brawijaya
+              Â© 2026 SAKTI FILKOM Â· Universitas Brawijaya
             </p>
           </div>
         </div>

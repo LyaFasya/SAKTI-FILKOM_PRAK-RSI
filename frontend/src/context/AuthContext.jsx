@@ -2,33 +2,48 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 
 import * as authService from "../services/authService.js";
 import {
-  ambilToken,
   ambilUserTersimpan,
   hapusSesi,
-  simpanSesi
+  simpanUser
 } from "../services/api.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // User dipulihkan dari localStorage supaya refresh halaman tidak logout.
-  const [user, setUser] = useState(() =>
-    ambilToken() ? ambilUserTersimpan() : null
-  );
+  // Dari localStorage biar refresh tidak balik ke login dulu
+  const [user, setUser] = useState(() => ambilUserTersimpan());
+
+  // Cek sesi ke backend saat app dibuka
+  useEffect(() => {
+    if (!ambilUserTersimpan()) return;
+
+    authService
+      .cekSesi()
+      .then((hasil) => {
+        simpanUser(hasil.data);
+        setUser(hasil.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const hasil = await authService.login(email, password);
-    simpanSesi(hasil.token, hasil.data);
+    simpanUser(hasil.data);
     setUser(hasil.data);
     return hasil.data;
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout();
+    } catch {
+      // Tetap logout di tampilan walau backend mati
+    }
     hapusSesi();
     setUser(null);
   }, []);
 
-  // Dipicu api.js ketika backend menjawab 401 (token salah atau habis 2 jam).
+  // Dipicu api.js saat 401
   useEffect(() => {
     const saatTidakSah = () => setUser(null);
     window.addEventListener("sakti:unauthorized", saatTidakSah);
