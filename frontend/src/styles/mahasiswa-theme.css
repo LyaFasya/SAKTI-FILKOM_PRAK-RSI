@@ -1,0 +1,146 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+/* ==========================================================
+   TEMA AREA MAHASISWA. Semua aturan dibatasi di dalam .mhs-app,
+   jadi tidak mengubah tampilan area staf (NC).
+   Warna diambil dari palet Figma "Portal Mahasiswa".
+   CATATAN: font Plus Jakarta Sans adalah tebakan dari tampilan desain,
+   cek di Figma (pilih teks, lihat panel Typography) dan ganti kalau beda.
+   ========================================================== */
+.mhs-app {
+  --m-navy-900: #091f5c;
+  --m-navy-800: #102552;
+  --m-blue-600: #334daf;
+  --m-blue-500: #405fb4;
+  --m-teks: #102552;
+  --m-redup: #6d82a3;
+  --m-garis: #dbe6f5;
+  --m-garis-tegas: #cfdcf0;
+  --m-latar: #f9fbff;
+  --m-latar-lembut: #edf3fa;
+  --m-info-bg: #eaf1fc;
+
+  --m-menunggu-bg: #fff7df;  --m-menunggu-garis: #f0dfaa;  --m-menunggu-teks: #9e7527;
+  --m-diproses-bg: #e6edfc;  --m-diproses-garis: #b7c8e3;  --m-diproses-teks: #334daf;
+  --m-disetujui-bg: #eaf8f1; --m-disetujui-garis: #cde8dd; --m-disetujui-teks: #358467;
+  --m-ditolak-bg: #fff0f3;   --m-ditolak-garis: #f1d4dc;   --m-ditolak-teks: #b45364;
+
+  display: flex; flex-direction: column; min-height: 100vh;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--m-teks);
+  background: linear-gradient(180deg, var(--m-latar) 0%, var(--m-latar-lembut) 100%);
+}
+
+/* ---------- Bar atas ---------- */
+.mhs-topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(250, 252, 255, 0.94); backdrop-filter: blur(8px);
+  border-bottom: 2px solid var(--m-garis);
+  box-shadow: 0 6px 24px rgba(51, 77, 175, 0.06);
+}
+.mhs-topbar__isi {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+  max-width: 1260px; height: 80px; margin: 0 auto; padding: 0 40px;
+}
+.mhs-merek { display: flex; align-items: center; gap: 12px; width: max-content; font-weight: 700; font-size: 1.05rem; color: var(--m-navy-800); text-decoration: none; }
+.mhs-merek__logo {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; color: #fff;
+  background: linear-gradient(135deg, #091f5c, #334daf);
+  box-shadow: 0 8px 16px rgba(51, 77, 175, 0.3);
+}
+.mhs-nav { display: flex; gap: 34px; height: 100%; }
+.mhs-nav__link {
+  position: relative; display: flex; align-items: center; gap: 8px; padding: 0 2px;
+  font-size: 0.88rem; font-weight: 500; color: var(--m-redup); text-decoration: none;
+}
+.mhs-nav__link:hover { color: var(--m-navy-800); }
+.mhs-nav__link--aktif { color: var(--m-navy-800); font-weight: 600; }
+.mhs-nav__link--aktif::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 3px;
+  border-radius: 3px 3px 0 0; background: var(--m-blue-600);
+}
+.mhs-profil { display: flex; align-items: center; gap: 12px; justify-self: end; }
+.mhs-profil__avatar {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  font-size: 0.8rem; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #405fb4, #334daf);
+  box-shadow: 0 4px 10px rgba(51, 77, 175, 0.3);
+}
+.mhs-profil__nama { font-size: 0.8rem; font-weight: 700; line-height: 1.3; }
+.mhs-profil__peran { font-size: 0.68rem; color: var(--m-redup); }
+.mhs-keluar {
+  display: grid; place-items: center; width: 34px; height: 34px; padding: 0;
+  color: var(--m-blue-600); background: transparent; border: 0; border-radius: 10px; cursor: pointer;
+}
+.mhs-keluar:hover { background: var(--m-latar-lembut); }
+
+/* ---------- Isi dan footer ---------- */
+.mhs-konten { flex: 1; width: 100%; max-width: 1260px; margin: 0 auto; padding: 28px 40px 48px; }
+.mhs-breadcrumb { margin-bottom: 22px; font-size: 0.72rem; font-weight: 500; color: var(--m-redup); }
+.mhs-breadcrumb a { color: inherit; text-decoration: none; }
+.mhs-breadcrumb a:hover { text-decoration: underline; }
+
+.mhs-footer {
+  display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+  padding: 22px 16px 32px; font-size: 0.7rem; color: var(--m-redup);
+}
+.mhs-footer__resmi { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.mhs-footer__logo { display: block; height: 26px; width: auto; }
+.mhs-footer__garis { width: 2px; height: 22px; background: var(--m-garis); }
+
+@media (max-width: 900px) {
+  .mhs-topbar__isi { grid-template-columns: 1fr auto; height: auto; padding: 12px 20px; }
+  .mhs-nav { grid-column: 1 / -1; grid-row: 2; justify-content: center; gap: 22px; height: 44px; }
+  .mhs-profil__teks { display: none; }
+  .mhs-konten { padding: 20px 20px 40px; }
+}
+
+/* ---------- Penyesuaian komponen bersama di dalam area mahasiswa ---------- */
+.mhs-app h1, .mhs-app h2, .mhs-app h3 { color: var(--m-navy-800); letter-spacing: -0.02em; }
+.mhs-app .page-header { margin-bottom: 26px; }
+.mhs-app .page-header h1 { margin: 0 0 8px; font-size: 2.2rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.035em; }
+.mhs-app .page-header p { margin: 0; font-size: 0.82rem; }
+.mhs-app .teks-redup { color: var(--m-redup); }
+:where(.mhs-app) a { color: var(--m-blue-600); }
+
+.mhs-app .kartu {
+  padding: 26px 28px; background: rgba(255, 255, 255, 0.92);
+  border: 2px solid var(--m-garis); border-radius: 28px;
+  box-shadow: 0 14px 34px rgba(51, 77, 175, 0.07);
+}
+.mhs-app .kartu h2 { margin: 0 0 8px; font-size: 1.3rem; font-weight: 800; }
+
+.mhs-app .tombol {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 11px 22px; font-size: 0.85rem; font-weight: 600; color: #fff;
+  background: var(--m-blue-600); border: 2px solid var(--m-blue-600); border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(51, 77, 175, 0.28);
+}
+.mhs-app .tombol:hover { background: var(--m-navy-900); border-color: var(--m-navy-900); }
+.mhs-app .tombol--garis { color: var(--m-teks); background: #fff; border-color: var(--m-garis); box-shadow: none; }
+.mhs-app .tombol--garis:hover { color: var(--m-teks); background: var(--m-latar-lembut); border-color: var(--m-garis-tegas); }
+.mhs-app .tombol:disabled { opacity: 0.55; box-shadow: none; }
+
+.mhs-app input, .mhs-app select, .mhs-app textarea {
+  font-family: inherit; font-size: 0.85rem; color: var(--m-teks);
+  padding: 12px 16px; background: #fcfdff;
+  border: 2px solid var(--m-garis); border-radius: 16px;
+}
+.mhs-app input::placeholder { color: #9eb0cb; }
+.mhs-app input:focus-visible, .mhs-app select:focus-visible { outline: none; border-color: var(--m-blue-500); box-shadow: 0 0 0 3px rgba(51, 77, 175, 0.18); }
+.mhs-app input[readonly] { color: var(--m-teks); background: #fcfdff; }
+.mhs-app :focus-visible { outline-color: var(--m-blue-600); }
+
+.mhs-app .pesan--error { color: var(--m-ditolak-teks); background: var(--m-ditolak-bg); border: 2px solid var(--m-ditolak-garis); border-radius: 16px; }
+.mhs-app .tabel-kosong td { color: var(--m-redup); }
+
+/* Lencana status memakai warna Figma */
+.mhs-app .badge {
+  display: inline-block; padding: 4px 14px; font-size: 0.72rem; font-weight: 500; white-space: nowrap;
+  border: 2px solid transparent; border-radius: 999px;
+}
+.mhs-app .badge--menunggu  { color: var(--m-menunggu-teks);  background: var(--m-menunggu-bg);  border-color: var(--m-menunggu-garis); }
+.mhs-app .badge--diproses  { color: var(--m-diproses-teks);  background: var(--m-diproses-bg);  border-color: var(--m-diproses-garis); }
+.mhs-app .badge--disetujui { color: var(--m-disetujui-teks); background: var(--m-disetujui-bg); border-color: var(--m-disetujui-garis); }
+.mhs-app .badge--ditolak   { color: var(--m-ditolak-teks);   background: var(--m-ditolak-bg);   border-color: var(--m-ditolak-garis); }
+.mhs-app .badge--netral    { color: var(--m-redup);          background: #eef3fb;               border-color: var(--m-garis); }
