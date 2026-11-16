@@ -1,171 +1,156 @@
-import { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { ShieldCheck, ArrowRight, GraduationCap, Building2 } from "lucide-react";
 
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
-import { halamanAwal } from "../../routes/index.jsx";
 import "./LoginPage.css";
 
-export default function LoginPage() {
-  const { user, login } = useAuth();
-  const navigate = useNavigate();
-  const lokasi = useLocation();
+import bannerImg from "../../assets/Section kiri login.png";
+import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
 
-  const [email, setEmail] = useState("");
+export default function LoginPage() {
+  const [nimEmail, setNimEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [pesanError, setPesanError] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [sedangMasuk, setSedangMasuk] = useState(false);
 
-  if (user) {
-    return <Navigate to={halamanAwal[user.role] ?? "/"} replace />;
-  }
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  async function kirim(event) {
-    event.preventDefault();
-    setPesanError("");
-    setSedangMasuk(true);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (!nimEmail.trim() || !password.trim()) {
+      setErrorMsg("Lengkapi NIM/Email dan kata sandi terlebih dahulu.");
+      return;
+    }
 
     try {
-      const akun = await login(email, password);
-      const tujuan = lokasi.state?.dari?.pathname ?? halamanAwal[akun.role] ?? "/";
-      navigate(tujuan, { replace: true });
+      setSedangMasuk(true);
+
+      const akun = await login(nimEmail, password);
+
+      if (!akun || !akun.role) {
+        throw new Error("Data akun tidak valid dari server.");
+      }
+
+      const role = String(akun.role).trim().toUpperCase();
+
+      if (role === "MAHASISWA") {
+        navigate("/dashboard", { replace: true });
+      } else if (role === "STAF") {
+        navigate("/staf/dashboard", { replace: true });
+      } else {
+        throw new Error("Role akun tidak dikenali.");
+      }
     } catch (error) {
-      setPesanError(error.message);
+      console.error("Login gagal:", error);
+      setErrorMsg(error.message || "Email atau kata sandi salah.");
     } finally {
       setSedangMasuk(false);
     }
-  }
+  };
 
   return (
     <div className="login-wrapper">
       <div className="login-card">
-        {/* ================= PANEL KIRI (BIRU GRADIENT) ================= */}
         <div className="login-left">
-          {/* Logo Brand */}
-          <div className="login-brand">
-            <div className="login-brand-icon">
-              <GraduationCap size={16} />
-            </div>
-            <span className="login-brand-text">SAKTI FILKOM</span>
-          </div>
-
-          {/* Hero Content */}
-          <div className="login-hero">
-            <p className="login-eyebrow">
-              SISTEM AKSES KEMAHASISWAAN TERINTEGRASI FILKOM
-            </p>
-            <h1 className="login-title">
-              Satu pintu untuk <br />layanan kampus.
-            </h1>
-            <p className="login-desc">
-              Ajukan kebutuhan kemahasiswaan, pantau proses, dan kelola layanan dalam satu ruang yang rapi.
-            </p>
-
-            {/* Pill Badges */}
-            <div className="login-badges">
-              <span className="login-badge">21 layanan kampus</span>
-              <span className="login-badge">Pelacakan terpusat</span>
-              <span className="login-badge">Dokumen lebih tertata</span>
-            </div>
-          </div>
-
-          {/* Footer Ilustrasi / Info Kiri */}
-          <div className="login-left-footer">
-            <div className="status-indicator">
-              <span className="status-dot"></span>
-              <Building2 size={14} />
-            </div>
-            <span>Portal Resmi Fakultas Ilmu Komputer Universitas Brawijaya</span>
-          </div>
+          <img
+            src={bannerImg}
+            alt="SAKTI FILKOM Banner"
+            className="banner-image"
+          />
         </div>
 
-        {/* ================= PANEL KANAN (FORM LOGIN) ================= */}
         <div className="login-right">
-          <div>
-            <div className="login-header-group">
-              <p className="login-welcome">Selamat datang kembali</p>
-              <span className="login-role-tag">AKSES MAHASISWA & STAF</span>
-              <h2 className="login-form-title">Masuk ke SAKTI FILKOM</h2>
+          <p className="welcome-text">Selamat datang kembali</p>
+          <span className="access-badge">AKSES MAHASISWA &amp; STAF</span>
+          <h1 className="login-title">Masuk ke SAKTI FILKOM</h1>
+
+          <form className="login-form" onSubmit={handleLogin} noValidate>
+            {errorMsg && (
+              <p className="login-error">
+                {errorMsg}
+              </p>
+            )}
+
+            <div className="form-group">
+              <label htmlFor="nimEmail">NIM atau email</label>
+              <input
+                type="text"
+                id="nimEmail"
+                value={nimEmail}
+                onChange={(e) => {
+                  setNimEmail(e.target.value);
+                  setErrorMsg("");
+                }}
+                placeholder="Masukkan NIM atau email kampus"
+                className="form-input"
+                autoComplete="username"
+                disabled={sedangMasuk}
+              />
             </div>
 
-            <form onSubmit={kirim} className="login-form">
-              {/* Field NIM / Email */}
-              <div className="form-group">
-                <label className="form-label">NIM atau email</label>
+            <div className="form-group">
+              <label htmlFor="password">Kata sandi</label>
+
+              <div className="password-wrapper">
                 <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Masukkan NIM atau email kampus"
-                  autoComplete="username"
-                  className="form-input"
-                  required
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrorMsg("");
+                  }}
+                  placeholder="Masukkan kata sandi"
+                  className="form-input password-input"
+                  autoComplete="current-password"
+                  disabled={sedangMasuk}
                 />
+
+                <button
+                  type="button"
+                  className="toggle-password-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Sembunyikan" : "Lihat"}
+                </button>
               </div>
+            </div>
 
-              {/* Field Password */}
-              <div className="form-group">
-                <label className="form-label">Kata sandi</label>
-                <div className="form-input-wrapper">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Masukkan kata sandi"
-                    autoComplete="current-password"
-                    className="form-input form-input-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="toggle-password-btn"
-                  >
-                    {showPassword ? "Sembunyi" : "Lihat"}
-                  </button>
-                </div>
-              </div>
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={sedangMasuk}
+            >
+              <span>{sedangMasuk ? "Memproses..." : "Masuk ke portal"}</span>
+              <span>→</span>
+            </button>
+          </form>
 
-              {pesanError && (
-                <div className="login-error-box">
-                  <p role="alert">{pesanError}</p>
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={sedangMasuk}
-                className="login-submit-btn"
-              >
-                <span>{sedangMasuk ? "Memproses..." : "Masuk ke portal"}</span>
-                {!sedangMasuk && <ArrowRight size={16} />}
-              </button>
-            </form>
+          <div className="security-notice">
+            <div className="check-icon">✓</div>
+            <div className="security-text">
+              <strong>Akses aman dan terpusat</strong>
+              <p>Gunakan akun kampus yang sesuai untuk melanjutkan.</p>
+            </div>
           </div>
 
-          {/* Footer Kanan (Security & Official Brand) */}
-          <div className="login-right-footer">
-            <div className="security-box">
-              <div className="security-icon">
-                <ShieldCheck size={18} />
-              </div>
-              <div>
-                <p className="security-title">Akses aman dan terpusat</p>
-                <p className="security-desc">
-                  Gunakan akun kampus yang sesuai untuk melanjutkan.
-                </p>
-              </div>
+          <div className="login-footer">
+            <div className="official-portal">
+              <span>PORTAL RESMI</span>
+              <img
+                src={logoFilkom}
+                alt="Logo FILKOM UB"
+                className="footer-logo"
+              />
             </div>
 
-            <div className="official-footer">
-              <div className="official-brand-label">PORTAL RESMI</div>
-              <div className="official-brand-name">FILKOM UB</div>
-              <div className="official-copyright">
-                © 2026 SAKTI FILKOM · Universitas Brawijaya
-              </div>
-            </div>
+            <p className="copyright">
+              © 2026 SAKTI FILKOM · Universitas Brawijaya
+            </p>
           </div>
         </div>
       </div>
