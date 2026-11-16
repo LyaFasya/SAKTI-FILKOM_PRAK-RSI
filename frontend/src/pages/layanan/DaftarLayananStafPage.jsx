@@ -15,8 +15,7 @@ import { ambilDaftarLayanan } from "../../services/layananService.js";
 import "./layanan.css";
 
 // LYN-UI01 | LYN-UC01 Melihat Daftar Layanan
-// Kondisi "Daftar Layanan Tidak Tersedia" tampil sebagai keadaan kosong di bawah.
-// Sumber desain: Figma "Daftar Layanan". Filter disimpan di URL (?q=...&kategori=...).
+// Filter disimpan di URL (?q=&kategori=)
 
 function ikonKategori(kategori) {
   const k = String(kategori).toLowerCase();
@@ -35,13 +34,13 @@ export default function DaftarLayananStafPage() {
   const kataKunci = params.get("q") ?? "";
   const kategori = params.get("kategori") ?? "";
 
-  // Teks di kolom cari baru dipakai saat tombol "Cari" ditekan (atau Enter).
+  // Kolom cari baru dipakai saat klik "Cari" / Enter
   const [kataKunciInput, setKataKunciInput] = useState(kataKunci);
   const [kategoriInput, setKategoriInput] = useState(kategori);
   useEffect(() => setKataKunciInput(kataKunci), [kataKunci]);
   useEffect(() => setKategoriInput(kategori), [kategori]);
 
-  // Daftar tanpa filter dipakai khusus untuk mengisi pilihan kategori.
+  // Daftar tanpa filter, khusus buat isi pilihan kategori
   const semua = useAmbilData(() => ambilDaftarLayanan(), []);
   const daftar = useAmbilData(
     () => ambilDaftarLayanan({ kataKunci, kategoriLayanan: kategori }),

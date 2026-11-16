@@ -4,7 +4,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { halamanAwal } from "../../routes/index.jsx";
 
-// Halaman login (LGN-UI01). Tampilan masih netral, sesuaikan dengan Figma.
+// LGN-UI01
 export default function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();

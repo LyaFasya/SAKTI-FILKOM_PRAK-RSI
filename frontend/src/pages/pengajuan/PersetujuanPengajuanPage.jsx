@@ -16,7 +16,6 @@ import { formatUkuranBerkas, kodePengajuan } from "../../utils/format.js";
 import "./detail-pengajuan.css";
 
 // PJN-UI10 | PJN-UC10 Menyetujui Pengajuan, PJN-UC11 Mengunggah Dokumen Hasil
-// Sumber desain: Figma "Persetujuan Pengajuan" dan "Pop up persetujuan".
 export default function PersetujuanPengajuanPage() {
   const { idPengajuan } = useParams();
   const navigate = useNavigate();
@@ -64,7 +63,7 @@ export default function PersetujuanPengajuanPage() {
 
   function tinjau() {
     setPesanForm("");
-    // Backend yang menentukan apakah semua dokumen wajib sudah diunggah dan berstatus Sesuai.
+    // Syarat lanjut setuju ditentukan backend
     if (!d.bisaLanjutPersetujuan) {
       setPesanForm("Masih ada lampiran wajib yang belum berstatus Sesuai. Selesaikan verifikasi dulu.");
       return;
@@ -81,7 +80,7 @@ export default function PersetujuanPengajuanPage() {
     setMenyimpan(true);
     setPesanPopup("");
     try {
-      // Unggah PDF ke backend, lalu konfirmasi persetujuan.
+      // Upload PDF lalu setujui
       await setujuiPengajuan(d.idPengajuan, berkas);
       navigate(`/staf/pengajuan/${d.idPengajuan}`);
     } catch (err) {

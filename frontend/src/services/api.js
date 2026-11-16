@@ -1,9 +1,5 @@
-// Pembungkus fetch untuk semua panggilan ke backend.
-// - Login memakai session cookie (sakti.sid) yang diatur backend,
-//   jadi frontend cukup mengirim cookie lewat credentials: "include".
-// - Mengubah respons error menjadi ApiError dengan pesan dari backend
-// - Jika backend menjawab 401 (sesi habis/belum login), data user dihapus
-//   dan AuthContext diberi tahu lewat event "sakti:unauthorized"
+// Pembungkus fetch ke backend: kirim cookie sesi, ubah error jadi ApiError,
+// dan kalau 401 hapus data user lalu kabari AuthContext (event "sakti:unauthorized")
 
 const KEY_USER = "sakti_user";
 
@@ -16,8 +12,7 @@ export class ApiError extends Error {
   }
 }
 
-// Hanya data akun (idAkun, email, role) agar halaman tidak berkedip saat refresh.
-// Keabsahan sesi tetap ditentukan backend lewat cookie.
+// Cuma data akun biar tidak berkedip saat refresh, validnya tetap dicek backend
 export function ambilUserTersimpan() {
   try {
     return JSON.parse(localStorage.getItem(KEY_USER));
@@ -39,7 +34,7 @@ export async function apiRequest(
   { method = "GET", body, abaikanUnauthorized = false } = {}
 ) {
   const headers = {};
-  // FormData (unggah berkas) dikirim apa adanya; browser mengatur Content-Type multipart sendiri.
+  // FormData dikirim apa adanya, Content-Type diatur browser
   const adalahForm = typeof FormData !== "undefined" && body instanceof FormData;
   if (body !== undefined && !adalahForm) headers["Content-Type"] = "application/json";
 

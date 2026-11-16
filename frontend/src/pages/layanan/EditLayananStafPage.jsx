@@ -8,8 +8,6 @@ import { ambilDetailLayanan, perbaruiInformasiLayanan } from "../../services/lay
 import "./layanan.css";
 
 // LYN-UI03 | LYN-UC02 Memperbarui Informasi Layanan
-// Sumber desain: Figma "Edit Informasi layanan".
-// Backend hanya menerima field informasiLayanan (PATCH /api/layanan/:id).
 export default function EditLayananStafPage() {
   const { idLayanan } = useParams();
   const navigate = useNavigate();

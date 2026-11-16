@@ -1,4 +1,4 @@
-// Judul halaman. `aksi` (opsional) = tombol di sisi kanan judul.
+// `aksi` = tombol opsional di kanan judul
 export default function PageHeader({ judul, deskripsi, aksi }) {
   return (
     <header className="page-header">

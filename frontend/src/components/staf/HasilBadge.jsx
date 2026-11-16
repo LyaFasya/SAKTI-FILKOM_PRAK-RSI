@@ -6,7 +6,7 @@ const KELAS = {
   [HASIL_VERIFIKASI.TIDAK_SESUAI]: "hasil-pill--tidak"
 };
 
-// Lencana hasil pemeriksaan satu lampiran: Belum Diverifikasi / Sesuai / Tidak Sesuai.
+// Badge hasil periksa satu lampiran
 export default function HasilBadge({ hasil }) {
   return <span className={`hasil-pill ${KELAS[hasil] ?? ""}`}>{hasil}</span>;
 }

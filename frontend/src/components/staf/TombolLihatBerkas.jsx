@@ -2,9 +2,9 @@ import { useState } from "react";
 
 import { ambilTautanBerkas } from "../../services/pengajuanService.js";
 
-// Tombol "Lihat": meminta tautan sementara berkas ke backend (Supabase Storage), lalu membukanya di tab baru.
-// Tab dibuka lebih dulu (sinkron saat klik) supaya tidak diblokir pop-up blocker.
-// Tombol dan pesan error dibungkus satu kolom supaya tidak menghimpit kolom nama berkas di baris flex.
+// Tombol "Lihat": ambil tautan sementara dari backend, buka di tab baru
+// Tab dibuka duluan biar tidak diblokir pop-up blocker
+// Dibungkus satu kolom supaya error tidak menghimpit nama berkas
 export default function TombolLihatBerkas({ idPengajuan, idDokumenPengajuan }) {
   const [memuat, setMemuat] = useState(false);
   const [pesan, setPesan] = useState("");

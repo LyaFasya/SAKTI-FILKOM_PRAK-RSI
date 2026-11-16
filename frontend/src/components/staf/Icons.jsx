@@ -1,4 +1,4 @@
-// Ikon sederhana (SVG) untuk area staf. Warna mengikuti warna teks sekitarnya.
+// Ikon SVG, warnanya ikut warna teks
 function Ikon({ children, ukuran = 20, ...sisa }) {
   return (
     <svg

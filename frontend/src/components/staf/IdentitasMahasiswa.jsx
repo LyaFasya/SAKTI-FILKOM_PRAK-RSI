@@ -1,5 +1,4 @@
-// Daftar identitas mahasiswa (Nama, NIM, Program studi, Email, HP/WA). Dipakai di
-// halaman Detail, Verifikasi, dan Persetujuan.
+// Identitas mahasiswa, dipakai di halaman Detail, Verifikasi, Persetujuan
 export default function IdentitasMahasiswa({ detail }) {
   const baris = [
     ["Nama", detail.namaMahasiswa],

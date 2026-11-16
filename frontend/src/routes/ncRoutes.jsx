@@ -1,5 +1,4 @@
-// RUTE MILIK NC: halaman Staf Kemahasiswaan.
-// Hanya NC yang mengubah file ini, sehingga tidak bentrok dengan AK dan DK.
+// Rute milik NC (staf)
 import DashboardPage from "../pages/dashboard/DashboardPage.jsx";
 import DaftarPengajuanPage from "../pages/pengajuan/DaftarPengajuanPage.jsx";
 import DetailPengajuanPage from "../pages/pengajuan/DetailPengajuanPage.jsx";
@@ -23,15 +22,14 @@ export const routeGroup = {
     { path: "/staf/pengajuan/:idPengajuan/verifikasi", element: <VerifikasiPengajuanPage /> },
     { path: "/staf/pengajuan/:idPengajuan/persetujuan", element: <PersetujuanPengajuanPage /> },
     { path: "/staf/pengajuan/:idPengajuan/penolakan", element: <PenolakanPengajuanPage /> },
-    // Menu "Rekapitulasi" ada di desain tapi belum dibagi ke siapa. Ganti elemen ini saat dikerjakan.
+    // TODO: Rekapitulasi belum dibagi, ganti saat dikerjakan
     { path: "/staf/rekapitulasi", element: <PlaceholderPage judul="Rekapitulasi" /> },
     { path: "/staf/layanan", element: <DaftarLayananStafPage /> },
     { path: "/staf/layanan/:idLayanan", element: <DetailLayananStafPage /> },
     { path: "/staf/layanan/:idLayanan/edit", element: <EditLayananStafPage /> },
-    // LYN-UC04 Edit Persyaratan bukan bagian NC (milik RF). Tombolnya sudah mengarah ke sini.
+    // LYN-UC04 bukan bagian NC, tombolnya sudah mengarah ke sini
     { path: "/staf/layanan/:idLayanan/persyaratan", element: <PlaceholderPage judul="Edit persyaratan layanan" uiId="LYN-UI04" useCase="LYN-UC04 Memperbarui Persyaratan Layanan" /> }
   ]
 };
 
-// Menu staf ada di components/staf/StafLayout.jsx, jadi tidak ditaruh di sini.
 export const navItems = [];

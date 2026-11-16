@@ -12,8 +12,7 @@ import {
   IkonTopi
 } from "./Icons.jsx";
 
-// Kerangka halaman untuk Staf Kemahasiswaan (sidebar navy + bar atas + footer).
-// Dipakai lewat ncRoutes.jsx. Tampilan mengikuti desain Figma "Dashboard Staf KMA".
+// Kerangka halaman staf (sidebar, bar atas, footer)
 const MENU = [
   { label: "Ringkasan Pengajuan", to: "/staf/dashboard", Ikon: IkonRingkasan },
   { label: "Daftar Pengajuan", to: "/staf/pengajuan", Ikon: IkonDokumen, tepat: true },
@@ -21,7 +20,7 @@ const MENU = [
   { label: "Kelola Layanan", to: "/staf/layanan", Ikon: IkonPengaturan }
 ];
 
-// Teks terakhir pada breadcrumb, sesuai halaman yang sedang dibuka.
+// Teks akhir breadcrumb
 const POLA_HALAMAN = [
   [/^\/staf\/dashboard/, "Ringkasan Pengajuan"],
   [/^\/staf\/pengajuan\/[^/]+\/verifikasi/, "Verifikasi Dokumen"],
@@ -29,7 +28,7 @@ const POLA_HALAMAN = [
   [/^\/staf\/pengajuan\/[^/]+\/penolakan/, "Penolakan Pengajuan"],
   [/^\/staf\/pengajuan\/[^/]+/, "Detail Pengajuan"],
   [/^\/staf\/pengajuan/, "Daftar Pengajuan"],
-  [/^\/staf\/rekapitulasi/, "Rekapitulasi"],
+  [/^\/staf\/rekapitulasi/, "Rekapitulasi Pengajuan"],
   [/^\/staf\/layanan\/[^/]+\/edit/, "Edit Layanan"],
   [/^\/staf\/layanan\/[^/]+\/persyaratan/, "Edit Persyaratan Layanan"],
   [/^\/staf\/layanan\/[^/]+/, "Detail Layanan"],
@@ -90,7 +89,7 @@ export default function StafLayout() {
             </div>
           </div>
 
-          {/* Backend belum mengirim nama staf saat login, jadi teks ini tetap. */}
+          {/* nama staf masih tetap, backend belum kirim saat login */}
           <div className="staf-profil">
             <span className="staf-profil__avatar" aria-hidden="true">SK</span>
             <div>

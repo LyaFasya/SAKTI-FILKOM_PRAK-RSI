@@ -4,9 +4,8 @@ import { formatTanggal, kodePengajuan } from "../../utils/format.js";
 import StatusBadge from "../StatusBadge.jsx";
 import { IkonPanah } from "./Icons.jsx";
 
-// Tabel pengajuan yang sama dipakai di Dashboard (5 baris) dan Daftar Pengajuan (semua baris).
-// Kalau daftar kosong, header tetap tampil dan muncul pesan "tidak ditemukan" (DSB-UI03).
-// Tampilan mengikuti Figma; gayanya ada di styles/staf-theme.css (kelas staf-tabel).
+// Dipakai di Dashboard (5 baris) dan Daftar Pengajuan (semua)
+// Kalau kosong muncul pesan "tidak ditemukan" (DSB-UI03)
 export default function TabelPengajuan({ daftar }) {
   return (
     <div className="staf-tabel-bungkus">

@@ -7,8 +7,6 @@ import { ambilDetailLayanan } from "../../services/layananService.js";
 import "./layanan.css";
 
 // LYN-UI02 | LYN-UC03 Melihat Persyaratan Layanan
-// Sumber desain: Figma "Detail Layanan".
-// Data: GET /api/layanan/:id (informasi, persyaratan umum, dan rincianFormulir).
 
 function ringkasanKelompok(k) {
   const bagian = [`${k.jumlahIsian ?? k.isian?.length ?? 0} isian`, `${k.jumlahLampiran ?? k.lampiran?.length ?? 0} lampiran`];

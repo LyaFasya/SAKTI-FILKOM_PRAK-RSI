@@ -15,7 +15,6 @@ import { formatTanggal, formatWaktuKeputusan, kodePengajuan } from "../../utils/
 import "./detail-pengajuan.css";
 
 // PJN-UI08 | PJN-UC08 Melihat Detail Pengajuan Mahasiswa
-// Sumber desain: Figma "Detail pengajuan" (4 kondisi: Menunggu Verifikasi, Diproses, Disetujui, Ditolak).
 export default function DetailPengajuanPage() {
   const { idPengajuan } = useParams();
   const { data: d, memuat, error } = useDetailPengajuan(idPengajuan);

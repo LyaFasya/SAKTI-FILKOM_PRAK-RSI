@@ -11,7 +11,6 @@ import { kodePengajuan } from "../../utils/format.js";
 import "./detail-pengajuan.css";
 
 // PJN-UI12 | PJN-UC12 Menolak Pengajuan, PJN-UC13 Mengisi Alasan Penolakan
-// Sumber desain: Figma "Penolakan pengajuan" dan "Pop up penolakan".
 export default function PenolakanPengajuanPage() {
   const { idPengajuan } = useParams();
   const navigate = useNavigate();

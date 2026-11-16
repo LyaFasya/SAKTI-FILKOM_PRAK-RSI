@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { ambilDokumenHasil } from "../../services/pengajuanService.js";
 
-// Kartu "Dokumen hasil tersedia" pada pengajuan yang sudah Disetujui.
-// Nama file diambil dari backend; PDF dibuka lewat tautan sementara yang diminta ulang setiap klik.
+// Kartu dokumen hasil untuk pengajuan Disetujui
+// Tautan PDF diminta ulang tiap klik (cepat kedaluwarsa)
 export default function KartuDokumenHasil({ idPengajuan }) {
   const [dokumen, setDokumen] = useState(null);
   const [memuat, setMemuat] = useState(false);

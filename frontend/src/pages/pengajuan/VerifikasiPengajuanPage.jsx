@@ -12,7 +12,7 @@ import { simpanHasilVerifikasi } from "../../services/pengajuanService.js";
 import { kodePengajuan } from "../../utils/format.js";
 import "./detail-pengajuan.css";
 
-// Satu lampiran: berkas + pilihan hasil + tombol Simpan.
+// Satu baris lampiran
 function FormLampiran({ idPengajuan, lampiran, onTersimpan }) {
   const [hasil, setHasil] = useState(
     lampiran.hasilVerifikasi === HASIL_VERIFIKASI.BELUM ? "" : lampiran.hasilVerifikasi
@@ -20,7 +20,7 @@ function FormLampiran({ idPengajuan, lampiran, onTersimpan }) {
   const [menyimpan, setMenyimpan] = useState(false);
   const [pesan, setPesan] = useState({ jenis: "", teks: "" });
 
-  // Hasil yang dipilih (nilaiBaru) langsung disimpan. Tombol Simpan memakai nilai yang sedang tampil.
+  // Dropdown langsung auto-simpan; tombol Simpan pakai nilai yang tampil
   async function simpan(nilaiBaru = hasil) {
     setPesan({ jenis: "", teks: "" });
     if (!nilaiBaru) {
@@ -82,7 +82,6 @@ function FormLampiran({ idPengajuan, lampiran, onTersimpan }) {
 }
 
 // PJN-UI09 | PJN-UC09 Memverifikasi Dokumen Pengajuan
-// Sumber desain: Figma "Verifikasi pengajuan".
 export default function VerifikasiPengajuanPage() {
   const { idPengajuan } = useParams();
   const navigate = useNavigate();
@@ -95,7 +94,7 @@ export default function VerifikasiPengajuanPage() {
     return <Navigate to={`/staf/pengajuan/${d.idPengajuan}`} replace />;
   }
 
-  // Backend yang menentukan: true kalau semua dokumen wajib sudah diunggah dan berstatus Sesuai.
+  // Syarat lanjut setuju ditentukan backend
   const siapDisetujui = Boolean(d.bisaLanjutPersetujuan);
 
   return (

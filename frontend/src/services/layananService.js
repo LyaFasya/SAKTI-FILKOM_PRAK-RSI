@@ -1,10 +1,6 @@
 import { apiRequest } from "./api.js";
 
-// Semua fungsi di sini memanggil API asli milik RF (branch feat/backend-foundation).
-// Respons backend berbentuk { message, data }, jadi yang dikembalikan adalah `data`.
-
-// GET /api/layanan?kataKunci=&kategoriLayanan=
-// Filter bersifat opsional. Tanpa argumen, semua layanan dikembalikan.
+// LYN-UC01
 export async function ambilDaftarLayanan({ kataKunci = "", kategoriLayanan = "" } = {}) {
   const query = new URLSearchParams();
   if (kataKunci) query.set("kataKunci", kataKunci);
@@ -14,21 +10,19 @@ export async function ambilDaftarLayanan({ kataKunci = "", kategoriLayanan = "" 
   return hasil.data;
 }
 
-// GET /api/layanan/:id
+// LYN-UC03
 export async function ambilDetailLayanan(idLayanan) {
   const hasil = await apiRequest(`/layanan/${idLayanan}`);
   return hasil.data;
 }
 
-// GET /api/layanan/:id/persyaratan
-// data: { ...layanan, persyaratan: [...], dokumenPersyaratan: [...] }
+// LYN-UC04 (bukan bagian NC), belum dipakai
 export async function ambilPersyaratanLayanan(idLayanan) {
   const hasil = await apiRequest(`/layanan/${idLayanan}/persyaratan`);
   return hasil.data;
 }
 
-// PATCH /api/layanan/:id  (khusus staf)
-// Saat ini backend HANYA menerima field "informasiLayanan".
+// LYN-UC02: backend cuma terima field informasiLayanan
 export async function perbaruiInformasiLayanan(idLayanan, informasiLayanan) {
   const hasil = await apiRequest(`/layanan/${idLayanan}`, {
     method: "PATCH",

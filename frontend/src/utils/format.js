@@ -1,4 +1,3 @@
-// Fungsi kecil untuk menampilkan data pengajuan sesuai desain.
 
 // "2026-10-20" -> "20/10/2026"
 export function formatTanggal(isoTanggal) {
@@ -8,8 +7,7 @@ export function formatTanggal(isoTanggal) {
 }
 
 // idPengajuan 1 + tanggal 2026-10-20 -> "PJN-2026-001"
-// CATATAN: format kode ini ditebak dari desain Figma. Cek dengan RF apakah backend
-// punya kolom kode sendiri; kalau ada, pakai itu dan hapus fungsi ini.
+// TODO: format kode ini tebakan dari Figma, cek ke RF
 export function kodePengajuan(pengajuan) {
   const tahun = pengajuan.tanggalPengajuan?.slice(0, 4) ?? "----";
   return `PJN-${tahun}-${String(pengajuan.idPengajuan).padStart(3, "0")}`;

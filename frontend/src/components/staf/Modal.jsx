@@ -2,8 +2,7 @@ import { useEffect, useId, useRef } from "react";
 
 import "./modal.css";
 
-// Pop-up konfirmasi memakai elemen <dialog> bawaan browser:
-// otomatis menahan fokus di dalam pop-up dan bisa ditutup dengan tombol Esc.
+// Pop-up pakai <dialog> bawaan browser (fokus ketahan, bisa Esc)
 export default function Modal({ terbuka, onTutup, eyebrow, judul, children }) {
   const dialogRef = useRef(null);
   const idJudul = useId();
@@ -22,7 +21,7 @@ export default function Modal({ terbuka, onTutup, eyebrow, judul, children }) {
       aria-labelledby={idJudul}
       onClose={onTutup}
       onClick={(e) => {
-        // klik di area gelap di luar kotak = tutup
+        // klik area gelap = tutup
         if (e.target === dialogRef.current) onTutup();
       }}
     >

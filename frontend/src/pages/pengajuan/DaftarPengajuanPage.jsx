@@ -9,17 +9,14 @@ import { ambilDaftarPengajuan, ambilOpsiLayanan } from "../../services/pengajuan
 import "./pengajuan.css";
 
 // DSB-UI02 | DSB-UC02 Melihat Daftar Pengajuan, DSB-UC03 Mencari dan Memfilter
-// DSB-UI03 (tidak ditemukan) tampil sebagai kondisi kosong di bawah.
-// Sumber desain: Figma "Daftar Pengajuan".
-// Filter disimpan di URL (?q=...&status=...&layanan=...), jadi bisa di-bookmark
-// dan tombol Back di browser tetap masuk akal.
+// Filter disimpan di URL (?q=&status=&layanan=) biar bisa di-bookmark
 export default function DaftarPengajuanPage() {
   const [params, setParams] = useSearchParams();
   const kataKunci = params.get("q") ?? "";
   const status = params.get("status") ?? "";
   const idLayanan = params.get("layanan") ?? "";
 
-  // Teks di kolom cari baru dipakai saat tombol "Cari" ditekan (atau Enter).
+  // Kolom cari baru dipakai saat klik "Cari" / Enter
   const [kataKunciInput, setKataKunciInput] = useState(kataKunci);
   useEffect(() => setKataKunciInput(kataKunci), [kataKunci]);
 

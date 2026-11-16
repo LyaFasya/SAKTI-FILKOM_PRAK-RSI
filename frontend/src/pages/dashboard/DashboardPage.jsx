@@ -18,9 +18,7 @@ const FILTER_AWAL = { kataKunci: "", status: "", idLayanan: "" };
 const MAKS_BARIS_DASHBOARD = 5;
 
 // DSB-UI01 | DSB-UC01 Ringkasan, DSB-UC02 Daftar, DSB-UC03 Cari dan Filter
-// Sumber desain: Figma "Dashboard Staf KMA".
-// Asumsi: kartu status menghitung SEMUA pengajuan; pencarian dan filter hanya
-// mempengaruhi jumlah per layanan dan tabel di bawahnya. Cocokkan dengan tim kalau beda.
+// Asumsi: kartu status hitung SEMUA pengajuan, cari/filter cuma pengaruh ke bar & tabel (cocokkan dengan tim)
 export default function DashboardPage() {
   const [kataKunciInput, setKataKunciInput] = useState("");
   const [filter, setFilter] = useState(FILTER_AWAL);
@@ -44,7 +42,7 @@ export default function DashboardPage() {
 
   const hasil = daftar.data ?? [];
   const layanan = opsiLayanan.data ?? [];
-  // Bar hanya untuk layanan yang punya pengajuan (sesuai desain).
+  // Bar cuma untuk layanan yang punya pengajuan
   const layananTampil = layanan
     .map((l) => ({
       nama: l.namaLayanan,

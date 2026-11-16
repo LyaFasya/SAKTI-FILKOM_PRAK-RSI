@@ -10,11 +10,10 @@ import {
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  // Data akun diambil dari localStorage supaya refresh tidak berkedip ke halaman login.
+  // Dari localStorage biar refresh tidak balik ke login dulu
   const [user, setUser] = useState(() => ambilUserTersimpan());
 
-  // Saat aplikasi dibuka, pastikan sesi di backend masih berlaku.
-  // Kalau sudah habis (2 jam) backend menjawab 401 dan api.js memicu event di bawah.
+  // Cek sesi ke backend saat app dibuka
   useEffect(() => {
     if (!ambilUserTersimpan()) return;
 
@@ -38,13 +37,13 @@ export function AuthProvider({ children }) {
     try {
       await authService.logout();
     } catch {
-      // Tetap keluar di sisi tampilan meskipun backend tidak terjangkau.
+      // Tetap logout di tampilan walau backend mati
     }
     hapusSesi();
     setUser(null);
   }, []);
 
-  // Dipicu api.js ketika backend menjawab 401 (belum login atau sesi habis).
+  // Dipicu api.js saat 401
   useEffect(() => {
     const saatTidakSah = () => setUser(null);
     window.addEventListener("sakti:unauthorized", saatTidakSah);
