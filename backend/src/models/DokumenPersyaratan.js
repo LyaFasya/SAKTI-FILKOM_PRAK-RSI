@@ -27,6 +27,30 @@ const DokumenPersyaratan = database.define(
       allowNull: false,
       defaultValue: true,
     },
+    petunjukUnggahan: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    kelompokFormulir: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+    },
+    format: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    maksimalFile: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    maksimalUkuranMb: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    ketentuanUnggahan: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     tableName: "DokumenPersyaratan",

@@ -4,7 +4,7 @@ import {
   database,
   Akun,
   StafKemahasiswaan,
-} from "./models/index.js";
+} from "../models/index.js";
 
 async function membuatStafPengujian() {
   try {

@@ -1,9 +1,17 @@
 import express from "express";
 import layananRoutes from "./routes/layananRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import sessionMiddleware from "./config/session.js";
+import rekapitulasiRoutes from "./routes/rekapitulasiRoutes.js";
+import pengajuanStafRoutes from "./routes/pengajuanStafRoutes.js";
+
+import pengajuanMahasiswaRoutes from "./routes/pengajuanMahasiswaRoutes.js";
+import { melihatNotifikasi } from "./controllers/PengajuanMahasiswaController.js";
+import { wajibLogin, khususMahasiswa } from "./middlewares/authMiddleware.js";
 
 const app = express();
 
+app.use(sessionMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -15,6 +23,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/layanan", layananRoutes);
+app.use("/api/rekapitulasi", rekapitulasiRoutes);
+app.use("/api/pengajuan/staf", pengajuanStafRoutes);
+app.use("/api/pengajuan", pengajuanMahasiswaRoutes);
+app.get("/api/notifikasi", wajibLogin, khususMahasiswa, melihatNotifikasi);
 
 app.use((req, res) => {
   res.status(404).json({
