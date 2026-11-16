@@ -18,18 +18,23 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<AppLayout />}>
-          <Route index element={<Beranda />} />
+        <Route index element={<Beranda />} />
+      </Route>
 
-          {routeGroups.map((grup, i) => (
-            <Route key={i} element={<ProtectedRoute roles={grup.roles} />}>
+      {/* Tiap kelompok rute boleh punya layout sendiri (grup.layout).
+          Kalau tidak diisi, dipakai AppLayout bawaan. */}
+      {routeGroups.map((grup, i) => {
+        const Layout = grup.layout ?? AppLayout;
+        return (
+          <Route key={i} element={<ProtectedRoute roles={grup.roles} />}>
+            <Route element={<Layout />}>
               {grup.routes.map((rute) => (
                 <Route key={rute.path} path={rute.path} element={rute.element} />
               ))}
             </Route>
-          ))}
-        </Route>
-      </Route>
+          </Route>
+        );
+      })}
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
