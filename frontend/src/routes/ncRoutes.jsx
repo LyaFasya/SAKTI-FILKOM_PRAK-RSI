@@ -12,6 +12,11 @@ import PlaceholderPage from "../components/PlaceholderPage.jsx";
 import StafLayout from "../components/staf/StafLayout.jsx";
 import { ROLE } from "../config/constants.js";
 
+// Halaman Edit Persyaratan (LYN-UC04) punya AK.
+const EditPersyaratanLayananPage = Object.values(
+  import.meta.glob("../pages/layanan/EditPersyaratanLayananPage.jsx", { eager: true })
+)[0]?.default;
+
 export const routeGroup = {
   roles: [ROLE.STAF],
   layout: StafLayout, // kerangka khusus staf (sidebar navy sesuai Figma)
@@ -22,13 +27,17 @@ export const routeGroup = {
     { path: "/staf/pengajuan/:idPengajuan/verifikasi", element: <VerifikasiPengajuanPage /> },
     { path: "/staf/pengajuan/:idPengajuan/persetujuan", element: <PersetujuanPengajuanPage /> },
     { path: "/staf/pengajuan/:idPengajuan/penolakan", element: <PenolakanPengajuanPage /> },
-    // TODO: Rekapitulasi belum dibagi, ganti saat dikerjakan
+    // Placeholder aja, halaman Rekapitulasi asli punya DK (dkStafRoutes.jsx, didahulukan)
     { path: "/staf/rekapitulasi", element: <PlaceholderPage judul="Rekapitulasi" /> },
     { path: "/staf/layanan", element: <DaftarLayananStafPage /> },
     { path: "/staf/layanan/:idLayanan", element: <DetailLayananStafPage /> },
     { path: "/staf/layanan/:idLayanan/edit", element: <EditLayananStafPage /> },
-    // LYN-UC04 bukan bagian NC, tombolnya sudah mengarah ke sini
-    { path: "/staf/layanan/:idLayanan/persyaratan", element: <PlaceholderPage judul="Edit persyaratan layanan" uiId="LYN-UI04" useCase="LYN-UC04 Memperbarui Persyaratan Layanan" /> }
+    {
+      path: "/staf/layanan/:idLayanan/persyaratan",
+      element: EditPersyaratanLayananPage
+        ? <EditPersyaratanLayananPage />
+        : <PlaceholderPage judul="Edit persyaratan layanan" uiId="LYN-UI04" useCase="LYN-UC04 Memperbarui Persyaratan Layanan" />
+    }
   ]
 };
 
