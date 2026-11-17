@@ -18,8 +18,9 @@ import {
 } from "lucide-react";
 
 import "./DashboardMahasiswa.css";
-import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
-import bannerIllus from "../../assets/Section kotak biru.png";
+import { ASET } from "../../config/aset.js";
+const logoFilkom = ASET.logoFilkomUb;
+const bannerIllus = ASET.bannerLayanan;
 
 const SERVICE_CATEGORIES = [
   {

@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import "./LoginPage.css";
 
-import bannerImg from "../../assets/Section kiri login.png";
-import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
+import { ASET } from "../../config/aset.js";
+const bannerImg = ASET.bannerLogin;
+const logoFilkom = ASET.logoFilkomUb;
 
 // LGN-UI01
 export default function LoginPage() {

@@ -18,7 +18,9 @@ import {
 import "./DashboardMahasiswa.css";
 import "./LayananTidakTersedia.css";
 
-import bannerIllus from "../../assets/Section kotak biru.png";import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
+import { ASET } from "../../config/aset.js";
+const bannerIllus = ASET.bannerLayanan;
+const logoFilkom = ASET.logoFilkomUb;
 
 const SERVICE_CATEGORIES = [
   { id: "kegiatan", title: "Kegiatan" },

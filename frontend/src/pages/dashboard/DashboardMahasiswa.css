@@ -155,13 +155,17 @@
 .hero-banner {
   width: 100%;
   margin-bottom: 32px;
-  line-height: 0; /* hilangkan celah kecil di bawah gambar */
+  line-height: 0;
 }
 
 .hero-banner-img {
   display: block;
-  width: 100%;
+  width: 108.5%;
+  max-width: none;
   height: auto;
+  margin-left: -4.25%;
+  margin-top: -4%;
+  margin-bottom: -4%;
 }
 
 /* 2-COLUMN DASHBOARD GRID */

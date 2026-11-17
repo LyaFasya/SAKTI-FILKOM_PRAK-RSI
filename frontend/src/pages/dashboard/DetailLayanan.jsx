@@ -1,34 +1,35 @@
-﻿
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 import "./DetailLayanan.css";
 
-import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
+import { ASET } from "../../config/aset.js";
+const logoFilkom = ASET.logoFilkomUb;
 
 const identityFields = [
-  ["Nama Pengaju", "Wajib ┬╖ Isian"],
-  ["NIM Pengaju", "Wajib ┬╖ Isian"],
-  ["Asal Prodi", "Wajib ┬╖ Pilihan"],
-  ["No. HP", "Wajib ┬╖ Isian"],
-  ["Email", "Wajib ┬╖ Email"],
+  ["Nama Pengaju", "Wajib · Isian"],
+  ["NIM Pengaju", "Wajib · Isian"],
+  ["Asal Prodi", "Wajib · Pilihan"],
+  ["No. HP", "Wajib · Isian"],
+  ["Email", "Wajib · Email"],
 ];
 
 const activityFields = [
-  ["Nama Kegiatan/Lomba", "Wajib ┬╖ Isian"],
-  ["Lokasi Kegiatan/Lomba", "Wajib ┬╖ Isian"],
-  ["Sebagai", "Wajib ┬╖ Pilihan"],
-  ["Other response (sesuai pilihan)", "Wajib ┬╖ Isian"],
-  ["Tanggal Awal Pelaksanaan Kegiatan", "Wajib ┬╖ Tanggal"],
-  ["Tanggal Akhir Pelaksanaan Kegiatan", "Wajib ┬╖ Tanggal"],
+  ["Nama Kegiatan/Lomba", "Wajib · Isian"],
+  ["Lokasi Kegiatan/Lomba", "Wajib · Isian"],
+  ["Sebagai", "Wajib · Pilihan"],
+  ["Other response (sesuai pilihan)", "Wajib · Isian"],
+  ["Tanggal Awal Pelaksanaan Kegiatan", "Wajib · Tanggal"],
+  ["Tanggal Akhir Pelaksanaan Kegiatan", "Wajib · Tanggal"],
 ];
 
 function FieldGroup({ title, description, fields }) {
   return (
     <section className="dl-field-group">
       <div className="dl-group-heading">
-        <span className="dl-chevron">Γû╛</span>
+        <span className="dl-chevron">▾</span>
         <div>
           <h3>{title}</h3>
           <p>{description}</p>
@@ -146,7 +147,7 @@ export default function DetailLayanan() {
           <div className="dl-avatar">{initials || "NP"}</div>
           <div className="dl-profile-info">
             <strong>{displayName}</strong>
-            <span>Mahasiswa ┬╖ Sistem Informasi</span>
+            <span>Mahasiswa · Sistem Informasi</span>
           </div>
           <button
             type="button"
@@ -191,27 +192,27 @@ export default function DetailLayanan() {
 
             <FieldGroup
               title="Identitas dan kontak"
-              description="5 isian ┬╖ 0 lampiran"
+              description="5 isian · 0 lampiran"
               fields={identityFields}
             />
 
             <FieldGroup
               title="Detil kegiatan / lomba"
-              description="6 isian ┬╖ 2 lampiran"
+              description="6 isian · 2 lampiran"
               fields={activityFields}
             />
 
             <div className="dl-upload-list">
               <UploadRequirement
                 title="Unggah Data Lampiran"
-                format="Spreadsheet (Excel) ┬╖ 1 file ┬╖ maksimal 1 MB per file"
+                format="Spreadsheet (Excel) · 1 file · maksimal 1 MB per file"
                 description="Daftar nama anggota dan mata kuliah yang diajukan dispensasi. Gunakan format MS Excel / spreadsheet."
                 status="Wajib"
               />
 
               <UploadRequirement
                 title="Unggah Data Pendukung"
-                format="PDF ┬╖ 1 file ┬╖ maksimal 10 MB per file"
+                format="PDF · 1 file · maksimal 10 MB per file"
                 description="Bukti pendukung berupa undangan / surat tugas / dokumen lain."
                 status="Opsional"
               />
@@ -275,7 +276,7 @@ export default function DetailLayanan() {
           <span>PORTAL RESMI</span>
           <img src={logoFilkom} alt="Logo FILKOM Universitas Brawijaya" />
         </div>
-        <p>┬⌐ 2026 SAKTI FILKOM ┬╖ Universitas Brawijaya</p>
+        <p>© 2026 SAKTI FILKOM · Universitas Brawijaya</p>
       </footer>
     </div>
   );
