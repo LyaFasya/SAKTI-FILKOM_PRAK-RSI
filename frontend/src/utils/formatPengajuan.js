@@ -51,3 +51,12 @@ export function formatUkuranMB(byte) {
 export function formatBatasMB(byte) {
   return `${Number((byte / (1024 * 1024)).toFixed(1))} MB`;
 }
+
+// Pesan notifikasi yang ditampilkan ke mahasiswa. Untuk status Disetujui teksnya dibakukan di sini
+// supaya notifikasi lama (yang sudah tersimpan di database) ikut memakai kalimat yang sama.
+export const PESAN_NOTIFIKASI_DISETUJUI =
+  "Pengajuan disetujui. Dokumen hasil tersedia dan dikirim melalui email. Silahkan cek inbox atau folder spam.";
+
+export function pesanNotifikasi({ statusPengajuan, pesan }) {
+  return statusPengajuan === "Disetujui" ? PESAN_NOTIFIKASI_DISETUJUI : pesan;
+}

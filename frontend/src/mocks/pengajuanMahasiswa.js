@@ -65,7 +65,7 @@ export const pengajuanSayaDummy = [
 ];
 
 export const notifikasiDummy = [
-  { idNotifikasi: 1, idPengajuan: 2, pesan: "Pengajuan disetujui. Dokumen hasil tersedia dan dikirim melalui email.", statusPengajuan: "Disetujui", tanggalPerubahan: "2026-10-19", waktuPerubahan: "10:15:00", statusPengirimanEmail: "Berhasil", keteranganEmail: null },
+  { idNotifikasi: 1, idPengajuan: 2, pesan: "Pengajuan disetujui. Dokumen hasil tersedia dan dikirim melalui email. Silahkan cek inbox atau folder spam.", statusPengajuan: "Disetujui", tanggalPerubahan: "2026-10-19", waktuPerubahan: "10:15:00", statusPengirimanEmail: "Berhasil", keteranganEmail: null },
   { idNotifikasi: 2, idPengajuan: 3, pesan: "Pengajuan ditolak. Dokumen KTM tidak terbaca dengan jelas sehingga identitas belum dapat diverifikasi.", statusPengajuan: "Ditolak", tanggalPerubahan: "2026-10-17", waktuPerubahan: "09:40:00", statusPengirimanEmail: "Berhasil", keteranganEmail: null },
   { idNotifikasi: 3, idPengajuan: 4, pesan: "Pengajuan sedang diproses oleh Staf Kemahasiswaan.", statusPengajuan: "Diproses", tanggalPerubahan: "2026-10-20", waktuPerubahan: "09:00:00", statusPengirimanEmail: "Berhasil", keteranganEmail: null }
 ];
