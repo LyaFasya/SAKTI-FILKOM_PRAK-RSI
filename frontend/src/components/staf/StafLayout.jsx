@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
-import logoFilkom from "../../assets/logo-filkom.png";
+import { ASET } from "../../config/aset.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import "../../styles/staf-theme.css";
 import {
@@ -110,7 +110,7 @@ export default function StafLayout() {
 
         <footer className="staf-footer">
           <span className="staf-footer__resmi">Portal resmi</span>
-          <img src={logoFilkom} alt="Logo FILKOM" className="staf-footer__logo" />
+          <img src={ASET.logoFilkom} alt="Logo FILKOM" className="staf-footer__logo" />
           <span className="staf-footer__garis" aria-hidden="true" />
           <span>© 2026 SAKTI FILKOM · Universitas Brawijaya</span>
         </footer>
