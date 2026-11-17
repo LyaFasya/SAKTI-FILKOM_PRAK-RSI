@@ -4,7 +4,7 @@ import { IkonPanah, IkonSurat } from "../../components/mahasiswa/Icons.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import useAmbilData from "../../hooks/useAmbilData.js";
 import { ambilNotifikasi } from "../../services/pengajuanMahasiswaService.js";
-import { formatTanggalWaktu } from "../../utils/formatPengajuan.js";
+import { formatTanggalWaktu, pesanNotifikasi } from "../../utils/formatPengajuan.js";
 
 // PJN-UC07 Menerima Notifikasi Perubahan Status Pengajuan
 // Tampilan mengikuti Figma "Notifikasi". Tiap baris membuka detail pengajuannya.
@@ -38,7 +38,7 @@ export default function NotifikasiPage() {
                         {n.kodePengajuan}
                         {n.namaLayanan && ` · ${n.namaLayanan}`}
                       </span>
-                      <p className="notifikasi__pesan">{n.pesan}</p>
+                      <p className="notifikasi__pesan">{pesanNotifikasi(n)}</p>
                       <span className="notifikasi__waktu">{formatTanggalWaktu(n.tanggalPerubahan, n.waktuPerubahan)}</span>
                     </span>
                     <IkonPanah className="notifikasi__panah" ukuran={14} />

@@ -37,7 +37,7 @@ export default function BerkasHasil({ idPengajuan, dokumenHasil, email }) {
       <span className="kotak-ikon"><IkonSurat ukuran={20} /></span>
       <h2 id="judul-dokumen-hasil">Dokumen hasil tersedia</h2>
       <p className="teks-redup">{dokumenHasil.namaDokumen}</p>
-      <p className="teks-redup">Dokumen hasil dikirim sebagai lampiran email ke akun mahasiswa.</p>
+      <p className="teks-redup">Dokumen hasil dikirim sebagai lampiran email ke akun mahasiswa. Silahkan cek inbox atau folder spam.</p>
       <p className="teks-redup" style={{ marginTop: 12 }}>Dikirim ke {email ?? "email mahasiswa"}</p>
       <button type="button" className="tautan-teks" onClick={unduh} disabled={mengunduh} style={{ marginTop: 12 }}>
         {mengunduh ? "Menyiapkan..." : "Unduh dokumen"}
