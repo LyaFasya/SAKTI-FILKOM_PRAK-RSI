@@ -39,7 +39,7 @@ export default function LoginPage() {
       const role = String(akun.role).trim().toUpperCase();
 
       if (role === "MAHASISWA") {
-        navigate("/dashboard", { replace: true });
+        navigate("/layanan", { replace: true });
       } else if (role === "STAF") {
         navigate("/staf/dashboard", { replace: true });
       } else {
@@ -127,12 +127,12 @@ export default function LoginPage() {
               disabled={sedangMasuk}
             >
               <span>{sedangMasuk ? "Memproses..." : "Masuk ke portal"}</span>
-              <span>â†’</span>
+              <span>→</span>
             </button>
           </form>
 
           <div className="security-notice">
-            <div className="check-icon">âœ“</div>
+            <div className="check-icon">✓</div>
             <div className="security-text">
               <strong>Akses aman dan terpusat</strong>
               <p>Gunakan akun kampus yang sesuai untuk melanjutkan.</p>
@@ -150,7 +150,7 @@ export default function LoginPage() {
             </div>
 
             <p className="copyright">
-              Â© 2026 SAKTI FILKOM Â· Universitas Brawijaya
+              © 2026 SAKTI FILKOM · Universitas Brawijaya
             </p>
           </div>
         </div>
