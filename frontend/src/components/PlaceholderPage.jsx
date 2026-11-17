@@ -1,7 +1,6 @@
 import PageHeader from "./PageHeader.jsx";
 
-// Halaman sementara untuk UI yang belum dikerjakan.
-// Ganti seluruh isi file halaman dengan implementasi dari Figma.
+// Halaman sementara untuk UI yang belum dikerjakan
 export default function PlaceholderPage({ judul, uiId, useCase }) {
   return (
     <>

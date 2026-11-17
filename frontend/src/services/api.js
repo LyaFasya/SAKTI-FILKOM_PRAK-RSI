@@ -1,10 +1,6 @@
-// Pembungkus fetch untuk semua panggilan ke backend.
-// - Otomatis menambahkan header Authorization: Bearer <token>
-// - Mengubah respons error menjadi ApiError dengan pesan dari backend
-// - Jika backend menjawab 401 (token salah/kedaluwarsa), sesi dihapus
-//   dan AuthContext diberi tahu lewat event "sakti:unauthorized"
+// Pembungkus fetch ke backend: kirim cookie sesi, ubah error jadi ApiError,
+// dan kalau 401 hapus data user lalu kabari AuthContext (event "sakti:unauthorized")
 
-const KEY_TOKEN = "sakti_token";
 const KEY_USER = "sakti_user";
 
 export class ApiError extends Error {
@@ -16,10 +12,7 @@ export class ApiError extends Error {
   }
 }
 
-export function ambilToken() {
-  return localStorage.getItem(KEY_TOKEN);
-}
-
+// Cuma data akun biar tidak berkedip saat refresh, validnya tetap dicek backend
 export function ambilUserTersimpan() {
   try {
     return JSON.parse(localStorage.getItem(KEY_USER));
@@ -28,13 +21,11 @@ export function ambilUserTersimpan() {
   }
 }
 
-export function simpanSesi(token, user) {
-  localStorage.setItem(KEY_TOKEN, token);
+export function simpanUser(user) {
   localStorage.setItem(KEY_USER, JSON.stringify(user));
 }
 
 export function hapusSesi() {
-  localStorage.removeItem(KEY_TOKEN);
   localStorage.removeItem(KEY_USER);
 }
 
@@ -43,10 +34,9 @@ export async function apiRequest(
   { method = "GET", body, abaikanUnauthorized = false } = {}
 ) {
   const headers = {};
-  const token = ambilToken();
-
-  if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (token) headers.Authorization = `Bearer ${token}`;
+  // FormData dikirim apa adanya, Content-Type diatur browser
+  const adalahForm = typeof FormData !== "undefined" && body instanceof FormData;
+  if (body !== undefined && !adalahForm) headers["Content-Type"] = "application/json";
 
   let response;
 
@@ -54,7 +44,8 @@ export async function apiRequest(
     response = await fetch(`/api${path}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined
+      credentials: "include",
+      body: body === undefined ? undefined : adalahForm ? body : JSON.stringify(body)
     });
   } catch {
     throw new ApiError(

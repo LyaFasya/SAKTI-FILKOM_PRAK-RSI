@@ -1,0 +1,324 @@
+
+.edit-persyaratan {
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  padding-bottom: 36px;
+  color: #102552;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.edit-persyaratan__breadcrumb {
+  margin-bottom: 24px;
+  color: #8a9bb5;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22px;
+}
+
+.edit-persyaratan__heading {
+  margin-bottom: 28px;
+}
+
+.edit-persyaratan__heading h1 {
+  margin: 0;
+  color: #102552;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.edit-persyaratan__heading p {
+  margin: 10px 0 0;
+  color: #6d82a3;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.edit-persyaratan__card {
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(112, 150, 209, 0.25);
+  border-radius: 17px;
+  box-shadow: 0 14px 35px rgba(9, 31, 92, 0.07);
+}
+
+.edit-persyaratan__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.edit-persyaratan__field label {
+  color: #102552;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.edit-persyaratan__field input,
+.edit-persyaratan__field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  color: #102552;
+  background: #fbfdff;
+  border: 1px solid #d9e4f2;
+  border-radius: 12px;
+  outline: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.edit-persyaratan__field input {
+  min-height: 47px;
+}
+
+.edit-persyaratan__field textarea {
+  min-height: 110px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.edit-persyaratan__field input::placeholder,
+.edit-persyaratan__field textarea::placeholder {
+  color: #9aaac0;
+}
+
+.edit-persyaratan__field input:focus,
+.edit-persyaratan__field textarea:focus {
+  border-color: #7096d1;
+  box-shadow: 0 0 0 3px rgba(112, 150, 209, 0.13);
+}
+
+.edit-persyaratan__section {
+  margin-top: 30px;
+}
+
+.edit-persyaratan__section-heading {
+  margin-bottom: 18px;
+}
+
+.edit-persyaratan__section-heading h2 {
+  margin: 0;
+  color: #102552;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.edit-persyaratan__document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.edit-persyaratan__document {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+  padding: 17px;
+  background: #ffffff;
+  border: 1px solid #dbe7f6;
+  border-radius: 12px;
+}
+
+.edit-persyaratan__document-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0;
+}
+
+.edit-persyaratan__document-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.edit-persyaratan__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #102552;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-persyaratan__checkbox input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #334daf;
+  cursor: pointer;
+}
+
+.edit-persyaratan__delete {
+  padding: 8px 7px;
+  color: #334daf;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-persyaratan__delete:hover {
+  background: #eef3ff;
+}
+
+.edit-persyaratan__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 15px;
+  padding: 8px 7px;
+  color: #334daf;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-persyaratan__add:hover {
+  background: #eef3ff;
+}
+
+.edit-persyaratan__add span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.edit-persyaratan__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  margin-top: 28px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.edit-persyaratan__save,
+.edit-persyaratan__cancel {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 12px 20px;
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.edit-persyaratan__save {
+  color: #ffffff;
+  background: linear-gradient(135deg, #334daf 0%, #263e9c 100%);
+  border: 1px solid #334daf;
+  box-shadow: 0 8px 18px rgba(51, 77, 175, 0.2);
+}
+
+.edit-persyaratan__save:hover {
+  background: #263e9c;
+  box-shadow: 0 10px 22px rgba(51, 77, 175, 0.25);
+}
+
+.edit-persyaratan__cancel {
+  color: #091f5c;
+  background: #ffffff;
+  border: 1px solid #d5e2f2;
+}
+
+.edit-persyaratan__cancel:hover {
+  background: #f5f8fd;
+}
+
+.edit-persyaratan__alert {
+  margin-bottom: 18px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.edit-persyaratan__alert--error {
+  color: #a52e35;
+  background: #fff1f1;
+  border: 1px solid #f3caca;
+}
+
+.edit-persyaratan__alert--success {
+  color: #216b47;
+  background: #effaf3;
+  border: 1px solid #c9ead5;
+}
+
+.edit-persyaratan__status {
+  padding: 35px 0;
+  color: #6d82a3;
+  text-align: center;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .edit-persyaratan {
+    max-width: 100%;
+  }
+
+  .edit-persyaratan__card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .edit-persyaratan__heading h1 {
+    font-size: 21px;
+  }
+
+  .edit-persyaratan__card {
+    padding: 17px;
+  }
+
+  .edit-persyaratan__document {
+    grid-template-columns: 1fr;
+    gap: 17px;
+    padding: 15px;
+  }
+
+  .edit-persyaratan__document-controls {
+    justify-content: flex-start;
+  }
+
+  .edit-persyaratan__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .edit-persyaratan__save,
+  .edit-persyaratan__cancel {
+    width: 100%;
+  }
+}
