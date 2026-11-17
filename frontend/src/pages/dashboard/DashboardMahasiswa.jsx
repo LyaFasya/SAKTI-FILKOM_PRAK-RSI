@@ -1,6 +1,7 @@
 ﻿
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 import {
   GraduationCap,
   LayoutGrid,
@@ -18,7 +19,7 @@ import {
 
 import "./DashboardMahasiswa.css";
 import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
-import bannerIllus from "../../assets/Section kanan atas layanan.png";
+import bannerIllus from "../../assets/Section kotak biru.png";
 
 const SERVICE_CATEGORIES = [
   {
@@ -118,7 +119,7 @@ const SERVICE_CATEGORIES = [
 
 export default function DashboardMahasiswa() {
   const navigate = useNavigate();
-
+  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState("layanan");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -238,10 +239,9 @@ export default function DashboardMahasiswa() {
           <div className="avatar-circle">NP</div>
           <div className="profile-info">
             <strong>Nanda Purwa</strong>
-            <span>Mahasiswa ┬╖ Sistem Informasi</span>
+            <span>Mahasiswa · Sistem Informasi</span>
           </div>
-          <button type="button" className="logout-icon-btn" title="Keluar">
-            <LogOut size={16} strokeWidth={1.8} />
+          <button type="button" className="logout-icon-btn" title="Keluar" onClick={logout}>            <LogOut size={16} strokeWidth={1.8} />
           </button>
         </div>
       </header>
@@ -279,7 +279,7 @@ export default function DashboardMahasiswa() {
 
                 <input
                   type="text"
-                  placeholder="Misalnya: rekomendasi, dispensasiΓÇª"
+                  placeholder="Misalnya: rekomendasi, dispensasi…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
@@ -399,7 +399,7 @@ export default function DashboardMahasiswa() {
 
               <div className="submission-item">
                 <span className="sub-code">
-                  PRK-2026-004 ┬╖ 20/03/2026
+                  PRK-2026-004 · 20/03/2026
                 </span>
 
                 <div className="sub-title-row">
@@ -414,7 +414,7 @@ export default function DashboardMahasiswa() {
 
               <div className="submission-item">
                 <span className="sub-code">
-                  SKM-2026-011 ┬╖ 20/03/2026
+                  SKM-2026-011 · 20/03/2026
                 </span>
 
                 <div className="sub-title-row">
@@ -475,7 +475,7 @@ export default function DashboardMahasiswa() {
           <span className="footer-divider">|</span>
 
           <span className="footer-copy">
-            ┬⌐ 2026 SAKTI FILKOM ┬╖ Universitas Brawijaya
+            © 2026 SAKTI FILKOM · Universitas Brawijaya
           </span>
         </div>
       </footer>

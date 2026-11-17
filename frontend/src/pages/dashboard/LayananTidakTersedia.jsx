@@ -1,6 +1,6 @@
 ﻿import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
+import { useAuth } from "../../context/AuthContext.jsx";
 import {
   GraduationCap,
   LayoutGrid,
@@ -18,8 +18,7 @@ import {
 import "./DashboardMahasiswa.css";
 import "./LayananTidakTersedia.css";
 
-import bannerIllus from "../../assets/Section kanan atas layanan.png";
-import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
+import bannerIllus from "../../assets/Section kotak biru.png";import logoFilkom from "../../assets/Image (FILKOM Universitas Brawijaya).png";
 
 const SERVICE_CATEGORIES = [
   { id: "kegiatan", title: "Kegiatan" },
@@ -35,6 +34,7 @@ const SERVICE_CATEGORIES = [
 
 function LayananTidakTersedia() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchedService = searchParams.get("search") || "";
@@ -117,13 +117,14 @@ function LayananTidakTersedia() {
 
           <div className="profile-info">
             <strong>Nanda Purwa</strong>
-            <span>Mahasiswa ┬╖ Sistem Informasi</span>
+            <span>Mahasiswa · Sistem Informasi</span>
           </div>
 
           <button
             type="button"
             className="logout-icon-btn"
             title="Keluar"
+            onClick={logout}
           >
             <LogOut size={16} strokeWidth={1.8} />
           </button>
@@ -169,7 +170,7 @@ function LayananTidakTersedia() {
 
                 <input
                   type="text"
-                  placeholder="Misalnya: rekomendasi, dispensasiΓÇª"
+                  placeholder="Misalnya: rekomendasi, dispensasi…"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                 />
@@ -308,7 +309,7 @@ function LayananTidakTersedia() {
 
               <div className="submission-item">
                 <span className="sub-code">
-                  PRK-2026-004 ┬╖ 20/03/2026
+                  PRK-2026-004 · 20/03/2026
                 </span>
 
                 <div className="sub-title-row">
@@ -326,7 +327,7 @@ function LayananTidakTersedia() {
 
               <div className="submission-item">
                 <span className="sub-code">
-                  SKM-2026-011 ┬╖ 20/10/2026
+                  SKM-2026-011 · 20/10/2026
                 </span>
 
                 <div className="sub-title-row">
@@ -404,7 +405,7 @@ function LayananTidakTersedia() {
           <span className="footer-divider">|</span>
 
           <span className="footer-copy">
-            ┬⌐ 2026 SAKTI FILKOM ┬╖ Universitas Brawijaya
+            © 2026 SAKTI FILKOM · Universitas Brawijaya
           </span>
         </div>
       </footer>
