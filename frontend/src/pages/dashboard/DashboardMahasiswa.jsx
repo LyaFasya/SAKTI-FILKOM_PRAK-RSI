@@ -1,7 +1,7 @@
 ﻿
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { ambilDaftarLayanan } from "../../services/layananService.js";
 import {
   GraduationCap,
   LayoutGrid,
@@ -124,26 +124,50 @@ export default function DashboardMahasiswa() {
   const [activeTab, setActiveTab] = useState("layanan");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [daftarLayanan, setDaftarLayanan] = useState([]);
+
+  useEffect(() => {
+    const muatLayanan = async () => {
+      try {
+        const data = await ambilDaftarLayanan();
+        setDaftarLayanan(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Gagal memuat daftar layanan:", error);
+      }
+    };
+
+    muatLayanan();
+  }, []);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const filteredCategories = SERVICE_CATEGORIES
     .filter((cat) => {
-      if (selectedCategory !== "all" && cat.id !== selectedCategory) {
-        return false;
-      }
-
-      return true;
+      return selectedCategory === "all" || cat.id === selectedCategory;
     })
     .map((cat) => {
+      const layananKategori = daftarLayanan
+        .filter((layanan) => layanan.kategoriLayanan === cat.title)
+        .map((layanan) => {
+          const itemStatis = cat.items.find(
+            (item) => item.name === layanan.namaLayanan
+          );
+
+          return {
+            idLayanan: layanan.idLayanan,
+            name: layanan.namaLayanan,
+            tag: itemStatis?.tag,
+          };
+        });
+
       const categoryMatches =
         normalizedQuery &&
         cat.title.toLowerCase().includes(normalizedQuery);
 
       const filteredItems =
         !normalizedQuery || categoryMatches
-          ? cat.items
-          : cat.items.filter((item) =>
+          ? layananKategori
+          : layananKategori.filter((item) =>
               item.name.toLowerCase().includes(normalizedQuery)
             );
 
@@ -153,22 +177,26 @@ export default function DashboardMahasiswa() {
       };
     })
     .filter((cat) => cat.items.length > 0);
-
   const handleSearch = () => {
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) return;
 
-    const hasMatch = SERVICE_CATEGORIES.some((cat) => {
-      if (selectedCategory !== "all" && cat.id !== selectedCategory) {
+    const hasMatch = daftarLayanan.some((layanan) => {
+      const kategori = SERVICE_CATEGORIES.find(
+        (cat) => cat.title === layanan.kategoriLayanan
+      );
+
+      if (
+        selectedCategory !== "all" &&
+        kategori?.id !== selectedCategory
+      ) {
         return false;
       }
 
       return (
-        cat.title.toLowerCase().includes(query) ||
-        cat.items.some((item) =>
-          item.name.toLowerCase().includes(query)
-        )
+        layanan.namaLayanan.toLowerCase().includes(query) ||
+        layanan.kategoriLayanan.toLowerCase().includes(query)
       );
     });
 
@@ -185,9 +213,9 @@ export default function DashboardMahasiswa() {
   };
 
   const handleServiceClick = (item) => {
-    if (item.name === "Dispensasi lomba atau kegiatan") {
-      navigate("/layanan/dispensasi");
-    }
+    if (!item.idLayanan) return;
+
+    navigate(`/layanan/${item.idLayanan}/ajukan`);
   };
 
   return (
@@ -215,8 +243,8 @@ export default function DashboardMahasiswa() {
 
           <button
             type="button"
-            className={`nav-item ${activeTab === "pengajuan" ? "active" : ""}`}
-            onClick={() => setActiveTab("pengajuan")}
+            className="nav-item"
+            onClick={() => navigate("/pengajuan-saya")}
           >
             <span className="nav-icon">
               <FileText size={15} strokeWidth={1.8} />
@@ -225,15 +253,15 @@ export default function DashboardMahasiswa() {
           </button>
 
           <button
-            type="button"
-            className={`nav-item ${activeTab === "notifikasi" ? "active" : ""}`}
-            onClick={() => setActiveTab("notifikasi")}
-          >
-            <span className="nav-icon">
-              <Bell size={15} strokeWidth={1.8} />
-            </span>
-            <span>Notifikasi</span>
-          </button>
+          type="button"
+          className="nav-item"
+          onClick={() => navigate("/notifikasi")}
+        >
+          <span className="nav-icon">
+            <Bell size={15} strokeWidth={1.8} />
+          </span>
+          <span>Notifikasi</span>
+        </button>
         </nav>
 
         <div className="nav-profile">
@@ -428,9 +456,13 @@ export default function DashboardMahasiswa() {
                 </span>
               </div>
 
-              <button type="button" className="view-all-link">
-                Semua pengajuan saya <ArrowRight size={14} />
-              </button>
+             <button
+              type="button"
+              className="view-all-link"
+              onClick={() => navigate("/pengajuan-saya")}
+            >
+              Semua pengajuan saya <ArrowRight size={14} />
+            </button>
             </div>
 
             <div className="sidebar-card info-highlight-card">
@@ -445,9 +477,13 @@ export default function DashboardMahasiswa() {
                 kampusmu.
               </p>
 
-              <button type="button" className="outline-pill-btn">
-                Lihat notifikasi <ArrowRight size={13} />
-              </button>
+              <button
+              type="button"
+              className="outline-pill-btn"
+              onClick={() => navigate("/notifikasi")}
+            >
+              Lihat notifikasi <ArrowRight size={13} />
+            </button>
             </div>
 
             <div className="sidebar-help-note">

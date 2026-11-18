@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { ambilDaftarLayanan } from "../../services/layananService.js";
 
 import "./DetailLayanan.css";
 
@@ -74,16 +75,34 @@ export default function DetailLayanan() {
     .join("")
     .toUpperCase();
 
-  const handleLogout = () => {
+      const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+const isiFormulir = async () => {
+  try {
+    const daftar = await ambilDaftarLayanan();
+
+    const layanan = daftar.find(
+      (l) => l.namaLayanan === "Dispensasi lomba atau kegiatan"
+    );
+
+    if (layanan) {
+      navigate(`/layanan/${layanan.idLayanan}/ajukan`);
+    } else {
+      alert("Layanan dispensasi tidak ditemukan.");
+    }
+  } catch (error) {
+    console.error("Gagal mengambil daftar layanan:", error);
+    alert("Gagal membuka formulir. Silakan coba lagi.");
+  }
+};
   return (
     <div className="detail-layanan-page">
       {/* NAVBAR */}
       <header className="dl-navbar">
-        <a className="dl-brand" href="/dashboard">
+        <a className="dl-brand" href="/layanan">          
           <div className="dl-brand-icon">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
@@ -249,11 +268,7 @@ export default function DetailLayanan() {
             <button
               type="button"
               className="dl-fill-button"
-              onClick={() =>
-                document
-                  .getElementById("rincian-formulir")
-                  ?.scrollIntoView({ behavior: "smooth", block: "center" })
-              }
+              onClick={isiFormulir}
             >
               Isi Formulir
               <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
