@@ -5,7 +5,7 @@ export function melihatSession(req, res) {
     message: "Session aktif.",
     data: req.akun,
   });
-}
+} 
 
 export function logout(req, res, next) {
   req.session.destroy((error) => {
