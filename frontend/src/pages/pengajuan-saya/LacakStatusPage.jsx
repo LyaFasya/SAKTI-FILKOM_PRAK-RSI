@@ -74,7 +74,7 @@ export default function LacakStatusPage() {
         </section>
 
         {disetujui ? (
-          <BerkasHasil idPengajuan={p.idPengajuan} dokumenHasil={p.dokumenHasil} email={p.identitas.email} />
+          <BerkasHasil dokumenHasil={p.dokumenHasil} email={p.identitas.email} />
         ) : (
           <section className="kartu kartu--info" aria-labelledby="judul-tahap">
             <span className="kotak-ikon"><IkonHati ukuran={20} /></span>

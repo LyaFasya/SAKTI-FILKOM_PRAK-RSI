@@ -136,12 +136,6 @@ export async function ambilDetailPengajuanSaya(idPengajuan) {
   };
 }
 
-// Tautan unduhan dokumen hasil (signed URL, berlaku 120 detik).
-export async function ambilUrlDokumenHasil(idPengajuan) {
-  const hasil = await apiRequest(`/pengajuan/${idPengajuan}/dokumen-hasil`);
-  return hasil.data.url;
-}
-
 // [{ idNotifikasi, idPengajuan, kodePengajuan, namaLayanan, pesan, statusPengajuan, tanggalPerubahan, waktuPerubahan }]
 export async function ambilNotifikasi() {
   const hasil = await apiRequest("/notifikasi");
