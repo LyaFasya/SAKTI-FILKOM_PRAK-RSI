@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-// Mengambil data async dan mengelola status loading/error.
-// Contoh: const { data, memuat, error } = useAmbilData(() => ambilDaftarLayanan(), []);
-// `deps` bekerja seperti dependency array useEffect: data diambil ulang saat nilainya berubah.
+// Ambil data async + status loading/error. `deps` seperti dependency array useEffect
 export default function useAmbilData(ambil, deps = []) {
   const [state, setState] = useState({ data: null, memuat: true, error: "" });
 

@@ -1,4 +1,4 @@
-// Nilai status harus PERSIS sama dengan yang ada di database (tabel Pengajuan).
+// Harus persis sama dengan nilai di database
 export const STATUS_PENGAJUAN = {
   MENUNGGU_VERIFIKASI: "Menunggu Verifikasi",
   DIPROSES: "Diproses",
@@ -8,8 +8,8 @@ export const STATUS_PENGAJUAN = {
 
 export const DAFTAR_STATUS = Object.values(STATUS_PENGAJUAN);
 
-// Nilai kolom role pada tabel Akun. "staf" sudah dipastikan dari backend.
-// Nilai untuk mahasiswa belum terlihat di kode backend, cek lagi dengan RF.
+// Role di tabel Akun
+// TODO: cek nilai role mahasiswa ke RF
 export const ROLE = {
   STAF: "staf",
   MAHASISWA: "mahasiswa"
