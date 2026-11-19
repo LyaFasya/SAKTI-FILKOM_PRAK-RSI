@@ -1,7 +1,8 @@
 ﻿
 import React, { useEffect, useState } from "react";import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
 import { ambilDaftarLayanan } from "../../services/layananService.js";
+import { ambilPengajuanSaya } from "../../services/pengajuanMahasiswaService.js";
+import { formatIdPengajuan, formatTanggalPendek } from "../../utils/formatPengajuan.js";
 import {
   GraduationCap,
   LayoutGrid,
@@ -17,6 +18,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+import HeaderMahasiswa from "../../components/mahasiswa/HeaderMahasiswa.jsx";
 import "./DashboardMahasiswa.css";
 import { ASET } from "../../config/aset.js";
 const logoFilkom = ASET.logoFilkomUb;
@@ -118,13 +120,26 @@ const SERVICE_CATEGORIES = [
   },
 ];
 
+// Warna badge sesuai status pengajuan
+const KELAS_STATUS = {
+  "Menunggu Verifikasi": "status-amber",
+  Diproses: "status-blue",
+  Disetujui: "status-green",
+  Ditolak: "status-red",
+};
+
 export default function DashboardMahasiswa() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState("layanan");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [daftarLayanan, setDaftarLayanan] = useState([]);
+  const [pengajuanTerakhir, setPengajuanTerakhir] = useState([]);
+
+  useEffect(() => {
+    ambilPengajuanSaya()
+      .then((data) => setPengajuanTerakhir(Array.isArray(data) ? data.slice(0, 2) : []))
+      .catch((error) => console.error("Gagal memuat pengajuan terakhir:", error));
+  }, []);
 
   useEffect(() => {
     const muatLayanan = async () => {
@@ -221,59 +236,7 @@ export default function DashboardMahasiswa() {
   return (
     <div className="dash-page">
       {/* TOP NAVBAR */}
-      <header className="dash-navbar">
-        <div className="nav-brand">
-          <div className="brand-logo-box">
-            <GraduationCap size={19} strokeWidth={1.9} />
-          </div>
-          <span className="brand-title">SAKTI FILKOM</span>
-        </div>
-
-        <nav className="nav-links">
-          <button
-            type="button"
-            className={`nav-item ${activeTab === "layanan" ? "active" : ""}`}
-            onClick={() => setActiveTab("layanan")}
-          >
-            <span className="nav-icon">
-              <LayoutGrid size={15} strokeWidth={1.8} />
-            </span>
-            <span>Layanan</span>
-          </button>
-
-          <button
-            type="button"
-            className="nav-item"
-            onClick={() => navigate("/pengajuan-saya")}
-          >
-            <span className="nav-icon">
-              <FileText size={15} strokeWidth={1.8} />
-            </span>
-            <span>Pengajuan Saya</span>
-          </button>
-
-          <button
-          type="button"
-          className="nav-item"
-          onClick={() => navigate("/notifikasi")}
-        >
-          <span className="nav-icon">
-            <Bell size={15} strokeWidth={1.8} />
-          </span>
-          <span>Notifikasi</span>
-        </button>
-        </nav>
-
-        <div className="nav-profile">
-          <div className="avatar-circle">NP</div>
-          <div className="profile-info">
-            <strong>Nanda Purwa</strong>
-            <span>Mahasiswa · Sistem Informasi</span>
-          </div>
-          <button type="button" className="logout-icon-btn" title="Keluar" onClick={logout}>            <LogOut size={16} strokeWidth={1.8} />
-          </button>
-        </div>
-      </header>
+      <HeaderMahasiswa />
 
       {/* MAIN CONTAINER */}
       <main className="dash-container">
@@ -426,35 +389,33 @@ export default function DashboardMahasiswa() {
                 </span>
               </div>
 
-              <div className="submission-item">
-                <span className="sub-code">
-                  PRK-2026-004 · 20/03/2026
-                </span>
+              {pengajuanTerakhir.length === 0 && (
+                <p className="sub-code">Belum ada pengajuan.</p>
+              )}
 
-                <div className="sub-title-row">
-                  <strong>Proposal kegiatan dan bantuan dana</strong>
-                  <ChevronRight size={16} strokeWidth={1.8} />
+              {pengajuanTerakhir.map((p) => (
+                <div
+                  key={p.idPengajuan}
+                  className="submission-item"
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/pengajuan-saya/${p.idPengajuan}`)}
+                >
+                  <span className="sub-code">
+                    {p.kodePengajuan ?? formatIdPengajuan(p.idPengajuan, p.tanggalPengajuan)} · {formatTanggalPendek(p.tanggalPengajuan)}
+                  </span>
+
+                  <div className="sub-title-row">
+                    <strong>{p.namaLayanan}</strong>
+                    <ChevronRight size={16} strokeWidth={1.8} />
+                  </div>
+
+                  <span className={`status-badge ${KELAS_STATUS[p.statusPengajuan] ?? "status-blue"}`}>
+                    {p.statusPengajuan}
+                  </span>
                 </div>
-
-                <span className="status-badge status-blue">
-                  Diproses
-                </span>
-              </div>
-
-              <div className="submission-item">
-                <span className="sub-code">
-                  SKM-2026-011 · 20/03/2026
-                </span>
-
-                <div className="sub-title-row">
-                  <strong>Surat Keterangan Aktif Mahasiswa</strong>
-                  <ChevronRight size={16} strokeWidth={1.8} />
-                </div>
-
-                <span className="status-badge status-amber">
-                  Menunggu Verifikasi
-                </span>
-              </div>
+              ))}
 
              <button
               type="button"

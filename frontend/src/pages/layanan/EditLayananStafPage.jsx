@@ -59,7 +59,8 @@ export default function EditLayananStafPage() {
     );
   }
 
-  const aktif = layanan.statusLayanan === "Aktif";
+  // Formulir "ditutup" (statusFormulir dari backend) = mahasiswa belum bisa ngajuin, jadi tampil Tidak Aktif
+  const aktif = layanan.statusLayanan === "Aktif" && layanan.statusFormulir !== "ditutup";
 
   return (
     <>
@@ -79,7 +80,7 @@ export default function EditLayananStafPage() {
           <div className="layanan-ringkas__status">
             <span><strong>Status</strong></span>
             <span className={aktif ? "layanan-status layanan-status--aktif" : "layanan-status"}>
-              {layanan.statusLayanan}
+              {aktif ? "Aktif" : "Tidak Aktif"}
             </span>
           </div>
         </div>

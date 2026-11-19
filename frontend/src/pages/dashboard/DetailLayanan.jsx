@@ -1,9 +1,9 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
 import { ambilDaftarLayanan } from "../../services/layananService.js";
 
+import HeaderMahasiswa from "../../components/mahasiswa/HeaderMahasiswa.jsx";
 import "./DetailLayanan.css";
 
 import { ASET } from "../../config/aset.js";
@@ -64,21 +64,6 @@ function UploadRequirement({ title, format, description, status }) {
 
 export default function DetailLayanan() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  const displayName = user?.name || user?.nama || "Nanda Purwa";
-  const initials = displayName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-
-      const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
 const isiFormulir = async () => {
   try {
@@ -101,86 +86,7 @@ const isiFormulir = async () => {
   return (
     <div className="detail-layanan-page">
       {/* NAVBAR */}
-      <header className="dl-navbar">
-        <a className="dl-brand" href="/layanan">          
-          <div className="dl-brand-icon">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="m3 9 9-5 9 5-9 5-9-5Z"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M7 11.2v4.2c2.8 2.1 7.2 2.1 10 0v-4.2"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <span>SAKTI FILKOM</span>
-        </a>
-
-        <nav className="dl-nav-links" aria-label="Navigasi utama">
-          <button
-            type="button"
-            className="dl-nav-item"
-            onClick={() => navigate("/layanan")}
-          >
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="2.5" y="2.5" width="6" height="6" rx="1" />
-              <rect x="11.5" y="2.5" width="6" height="6" rx="1" />
-              <rect x="2.5" y="11.5" width="6" height="6" rx="1" />
-              <rect x="11.5" y="11.5" width="6" height="6" rx="1" />
-            </svg>
-            Layanan
-          </button>
-
-          <button
-            type="button"
-            className="dl-nav-item"
-            onClick={() => navigate("/pengajuan-saya")}
-          >
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M5 2.5h7l3 3v12H5v-15Z" />
-              <path d="M12 2.5v3h3M8 9h4M8 12h4" />
-            </svg>
-            Pengajuan Saya
-          </button>
-
-          <button
-            type="button"
-            className="dl-nav-item"
-            onClick={() => navigate("/notifikasi")}
-          >
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M15.5 8a5.5 5.5 0 0 0-11 0c0 6-2 6-2 7h15c0-1-2-1-2-7Z" />
-              <path d="M8 17h4" />
-            </svg>
-            Notifikasi
-          </button>
-        </nav>
-
-        <div className="dl-profile">
-          <div className="dl-avatar">{initials || "NP"}</div>
-          <div className="dl-profile-info">
-            <strong>{displayName}</strong>
-            <span>Mahasiswa · Sistem Informasi</span>
-          </div>
-          <button
-            type="button"
-            className="dl-logout"
-            onClick={handleLogout}
-            title="Keluar"
-            aria-label="Keluar"
-          >
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M8 3H4v14h4M11 6l4 4-4 4M15 10H7" />
-            </svg>
-          </button>
-        </div>
-      </header>
+      <HeaderMahasiswa />
 
       {/* MAIN CONTENT */}
       <main className="dl-container">
