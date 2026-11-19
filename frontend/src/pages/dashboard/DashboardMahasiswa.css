@@ -575,3 +575,8 @@
     display: none;
   }
 }
+
+/* Navbar sama di semua halaman mahasiswa */
+.dash-navbar a.nav-brand,
+.dash-navbar a.nav-item { text-decoration: none; }
+html { scrollbar-gutter: stable; }
