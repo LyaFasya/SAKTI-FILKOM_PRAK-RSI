@@ -408,3 +408,60 @@ export async function melihatNotifikasi(req, res, next) {
     return next(error);
   }
 }
+
+export async function melihatLampiranPengajuanSaya(req, res, next) {
+  const idPengajuan = bacaId(req.params.idPengajuan);
+  const idDokumenPengajuan = bacaId(req.params.idDokumenPengajuan);
+
+  if (idPengajuan === null || idDokumenPengajuan === null) {
+    return res.status(400).json({
+      message: "ID pengajuan atau ID berkas tidak valid.",
+    });
+  }
+
+  try {
+    const pengajuan = await ambilPengajuanMilik(req, idPengajuan, {
+      attributes: ["idPengajuan"],
+    });
+
+    if (!pengajuan) {
+      return responsPengajuanTidakAda(res);
+    }
+
+    const berkas = await DokumenPengajuan.findOne({
+      where: {
+        idPengajuan,
+        idDokumenPengajuan,
+      },
+    });
+
+    if (
+      !berkas ||
+      typeof berkas.lokasiFile !== "string" ||
+      !berkas.lokasiFile.startsWith(`pengajuan/${idPengajuan}/`)
+    ) {
+      return res.status(404).json({
+        message: "Lampiran pengajuan tidak tersedia di Storage.",
+      });
+    }
+
+    const format = String(berkas.formatFile).toUpperCase();
+    const bisaDitampilkan = [
+      "PDF",
+      "JPG",
+      "JPEG",
+      "PNG",
+      "WEBP",
+      "GIF",
+    ].includes(format);
+
+    return await kirimTautanBerkas(
+      res,
+      ambilBucketLampiranPengajuan(),
+      berkas.lokasiFile,
+      bisaDitampilkan ? false : berkas.namaFile
+    );
+  } catch (error) {
+    return next(error);
+  }
+}

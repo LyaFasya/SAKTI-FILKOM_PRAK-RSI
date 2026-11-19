@@ -6,6 +6,7 @@ import {
   melihatDetailPengajuanSaya,
   melacakStatusPengajuan,
   mengunduhDokumenHasil,
+  melihatLampiranPengajuanSaya,
 } from "../controllers/PengajuanMahasiswaController.js";
 import { wajibLogin, khususMahasiswa } from "../middlewares/authMiddleware.js";
 import { menerimaLampiranPengajuan } from "../middlewares/unggahLampiranPengajuan.js";
@@ -19,5 +20,6 @@ router.post("/", menerimaLampiranPengajuan, mengirimPengajuan);
 router.get("/:idPengajuan/status", melacakStatusPengajuan);
 router.get("/:idPengajuan/dokumen-hasil", mengunduhDokumenHasil);
 router.get("/:idPengajuan", melihatDetailPengajuanSaya);
+router.get("/:idPengajuan/berkas/:idDokumenPengajuan",melihatLampiranPengajuanSaya);
 
 export default router;
