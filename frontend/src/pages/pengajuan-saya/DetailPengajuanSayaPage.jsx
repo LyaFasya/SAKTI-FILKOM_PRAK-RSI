@@ -107,7 +107,7 @@ export default function DetailPengajuanSayaPage() {
             </section>
           )}
 
-          {disetujui && <BerkasHasil idPengajuan={p.idPengajuan} dokumenHasil={p.dokumenHasil} email={i.email} />}
+          {disetujui && <BerkasHasil dokumenHasil={p.dokumenHasil} email={i.email} />}
         </div>
       </div>
     </>

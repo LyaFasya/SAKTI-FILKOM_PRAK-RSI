@@ -31,49 +31,11 @@
   background: linear-gradient(180deg, var(--m-latar) 0%, var(--m-latar-lembut) 100%);
 }
 
-/* ---------- Bar atas ---------- */
-.mhs-topbar {
-  position: sticky; top: 0; z-index: 50;
-  display: flex; justify-content: space-between; align-items: center;
-  height: 78px; padding: 0 6%;
-  background: rgba(249, 251, 255, 0.94); backdrop-filter: blur(18px);
-  border-bottom: 1.5px solid rgba(112, 150, 209, 0.2);
-  box-shadow: 0 8px 32px rgba(9, 31, 92, 0.04);
-}
-.mhs-merek { display: flex; align-items: center; gap: 11px; width: max-content; text-decoration: none; }
-.mhs-merek__logo {
-  display: flex; align-items: center; justify-content: center; width: 38px; height: 38px;
-  border-radius: 12px; color: #fff;
-  background: linear-gradient(145deg, #334daf 0%, #091f5c 100%);
-  box-shadow: 0 9px 20px rgba(51, 77, 175, 0.22);
-}
-.mhs-merek__judul { font-size: 17px; font-weight: 700; color: #091f5c; }
-.mhs-nav { display: flex; align-items: center; gap: 28px; height: 100%; }
-.mhs-nav__link {
-  position: relative; display: flex; align-items: center; gap: 7px; height: 100%; padding: 0 4px;
-  font-size: 13px; font-weight: 600; color: #7082a0; text-decoration: none;
-}
-.mhs-nav__link:hover { color: #091f5c; }
-.mhs-nav__link--aktif { color: #091f5c; }
-.mhs-nav__link--aktif::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
-  border-radius: 4px 4px 0 0; background: #334daf;
-}
-.mhs-profil { display: flex; align-items: center; gap: 12px; }
-.mhs-profil__avatar {
-  display: flex; align-items: center; justify-content: center; width: 38px; height: 38px;
-  border-radius: 50%; border: 2px solid #fff; font-size: 12px; font-weight: 700; color: #fff;
-  background: linear-gradient(145deg, #7096d1 0%, #334daf 100%);
-  box-shadow: 0 6px 16px rgba(51, 77, 175, 0.2);
-}
-.mhs-profil__teks { display: flex; flex-direction: column; }
-.mhs-profil__nama { font-size: 11.5px; font-weight: 700; color: #102552; }
-.mhs-profil__peran { font-size: 10px; color: #6d82a3; }
-.mhs-keluar {
-  display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0;
-  color: #334daf; background: #fff; border: 1px solid #dce7f3; border-radius: 9px; cursor: pointer;
-}
-.mhs-keluar:hover { background: var(--m-latar-lembut); }
+/* ---------- Bar atas dan footer ----------
+   Memakai kelas milik AK (.dash-navbar, .dash-footer di pages/dashboard/DashboardMahasiswa.css).
+   Hanya penyesuaian kecil di bawah ini yang milik DK. */
+.mhs-app a.nav-brand, .mhs-app a.nav-item { text-decoration: none; }
+.mhs-app .avatar-circle { flex: none; }
 
 /* ---------- Isi dan footer ---------- */
 .mhs-konten { flex: 1; width: 100%; max-width: 1260px; margin: 0 auto; padding: 28px 40px 48px; }
@@ -81,20 +43,12 @@
 .mhs-breadcrumb a { color: inherit; text-decoration: none; }
 .mhs-breadcrumb a:hover { text-decoration: underline; }
 
-.mhs-footer {
-  padding: 20px 32px; border-top: 1px solid #dce7f3; background: rgba(249, 251, 255, 0.8);
-}
-.mhs-footer__isi {
-  display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
-  font-size: 10px; color: #8799b3;
-}
-.mhs-footer__resmi { font-size: 8.5px; font-weight: 700; letter-spacing: 0.9px; }
-.mhs-footer__logo { display: block; height: 20px; width: auto; object-fit: contain; }
-
-@media (max-width: 900px) {
-  .mhs-topbar { flex-wrap: wrap; height: auto; padding: 12px 20px; row-gap: 4px; }
-  .mhs-nav { order: 3; width: 100%; justify-content: center; gap: 22px; height: 44px; }
-  .mhs-profil__teks { display: none; }
+@media (max-width: 960px) {
+  /* AK menyembunyikan menu di layar kecil. Di halaman DK menu tetap dibutuhkan untuk
+     berpindah halaman, jadi dipindah ke baris kedua. */
+  .mhs-app .dash-navbar { height: auto; flex-wrap: wrap; padding-top: 10px; padding-bottom: 0; row-gap: 4px; }
+  .mhs-app .nav-links { display: flex; order: 3; width: 100%; height: 44px; justify-content: center; gap: 22px; }
+  .mhs-app .profile-info { display: none; }
   .mhs-konten { padding: 20px 20px 40px; }
 }
 
