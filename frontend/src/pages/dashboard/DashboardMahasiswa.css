@@ -80,7 +80,7 @@
 .nav-item.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -1.5px; /* nempel pas di garis bawah navbar */
   left: 0;
   right: 0;
   height: 3px;
@@ -460,6 +460,16 @@
 .status-amber {
   background: #FEF3C7;
   color: #B45309;
+}
+
+.status-green {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.status-red {
+  background: #FEE2E2;
+  color: #B91C1C;
 }
 
 .view-all-link {

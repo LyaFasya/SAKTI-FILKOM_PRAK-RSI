@@ -1,6 +1,5 @@
 ﻿import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
 import {
   GraduationCap,
   LayoutGrid,
@@ -15,6 +14,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
+import HeaderMahasiswa from "../../components/mahasiswa/HeaderMahasiswa.jsx";
 import "./DashboardMahasiswa.css";
 import "./LayananTidakTersedia.css";
 
@@ -36,14 +36,12 @@ const SERVICE_CATEGORIES = [
 
 function LayananTidakTersedia() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchedService = searchParams.get("search") || "";
 
   const [search, setSearch] = useState(searchedService);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [activeTab, setActiveTab] = useState("layanan");
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -64,74 +62,7 @@ function LayananTidakTersedia() {
   return (
     <div className="dash-page layanan-unavailable-page">
       {/* TOP NAVBAR */}
-      <header className="dash-navbar">
-        <div className="nav-brand">
-          <div className="brand-logo-box">
-            <GraduationCap size={19} strokeWidth={1.9} />
-          </div>
-
-          <span className="brand-title">SAKTI FILKOM</span>
-        </div>
-
-        <nav className="nav-links">
-          <button
-            type="button"
-            className={`nav-item ${
-              activeTab === "layanan" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("layanan")}
-          >
-            <span className="nav-icon">
-              <LayoutGrid size={15} strokeWidth={1.8} />
-            </span>
-            <span>Layanan</span>
-          </button>
-
-          <button
-            type="button"
-            className={`nav-item ${
-              activeTab === "pengajuan" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("pengajuan")}
-          >
-            <span className="nav-icon">
-              <FileText size={15} strokeWidth={1.8} />
-            </span>
-            <span>Pengajuan Saya</span>
-          </button>
-
-          <button
-            type="button"
-            className={`nav-item ${
-              activeTab === "notifikasi" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("notifikasi")}
-          >
-            <span className="nav-icon">
-              <Bell size={15} strokeWidth={1.8} />
-            </span>
-            <span>Notifikasi</span>
-          </button>
-        </nav>
-
-        <div className="nav-profile">
-          <div className="avatar-circle">NP</div>
-
-          <div className="profile-info">
-            <strong>Nanda Purwa</strong>
-            <span>Mahasiswa · Sistem Informasi</span>
-          </div>
-
-          <button
-            type="button"
-            className="logout-icon-btn"
-            title="Keluar"
-            onClick={logout}
-          >
-            <LogOut size={16} strokeWidth={1.8} />
-          </button>
-        </div>
-      </header>
+      <HeaderMahasiswa />
 
       {/* MAIN CONTAINER */}
       <main className="dash-container">
