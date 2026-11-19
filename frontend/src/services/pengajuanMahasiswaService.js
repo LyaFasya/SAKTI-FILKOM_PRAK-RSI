@@ -136,6 +136,12 @@ export async function ambilDetailPengajuanSaya(idPengajuan) {
   };
 }
 
+// Tautan sementara (120 detik) ke lampiran di Supabase Storage; dipanggil ulang tiap mau buka
+export async function ambilTautanLampiranSaya(idPengajuan, idDokumenPengajuan) {
+  const hasil = await apiRequest(`/pengajuan/${idPengajuan}/berkas/${idDokumenPengajuan}`);
+  return hasil.data.url;
+}
+
 // [{ idNotifikasi, idPengajuan, kodePengajuan, namaLayanan, pesan, statusPengajuan, tanggalPerubahan, waktuPerubahan }]
 export async function ambilNotifikasi() {
   const hasil = await apiRequest("/notifikasi");

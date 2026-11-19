@@ -3,12 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import BerkasHasil from "../../components/dk/BerkasHasil.jsx";
 import PengajuanTidakDitemukan from "../../components/dk/PengajuanTidakDitemukan.jsx";
 import { IkonPanah } from "../../components/mahasiswa/Icons.jsx";
+import TombolLihatBerkas from "../../components/staf/TombolLihatBerkas.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import StatusBadge from "../../components/StatusBadge.jsx";
 import { STATUS_PENGAJUAN } from "../../config/constants.js";
 import { KELAS_STATUS_DOKUMEN } from "../../config/formPengajuan.js";
 import useAmbilData from "../../hooks/useAmbilData.js";
-import { ambilDetailPengajuanSaya } from "../../services/pengajuanMahasiswaService.js";
+import { ambilDetailPengajuanSaya, ambilTautanLampiranSaya } from "../../services/pengajuanMahasiswaService.js";
 import { formatTanggalPendek } from "../../utils/formatPengajuan.js";
 
 // PJN-UI03 Detail Menunggu Verifikasi | PJN-UI04 Detail Selesai (Disetujui) | PJN-UI05 Detail Ditolak
@@ -75,10 +76,12 @@ export default function DetailPengajuanSayaPage() {
                     <span className="berkas__ket">{d.namaDokumen}</span>
                   </span>
                   <span className={`badge ${KELAS_STATUS_DOKUMEN[d.statusDokumen] ?? ""}`}>{d.statusDokumen}</span>
-                  {/* Backend belum punya endpoint bagi mahasiswa untuk membuka lampirannya. */}
-                  <button type="button" className="tautan-teks" disabled title="Pratinjau lampiran belum tersedia">
-                    Lihat
-                  </button>
+                  <TombolLihatBerkas
+                    idPengajuan={p.idPengajuan}
+                    idDokumenPengajuan={d.idDokumenPengajuan}
+                    ambilTautan={ambilTautanLampiranSaya}
+                    kelas="tautan-teks"
+                  />
                 </li>
               ))}
             </ul>

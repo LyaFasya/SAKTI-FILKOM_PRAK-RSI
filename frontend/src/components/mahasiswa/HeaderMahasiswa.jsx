@@ -2,7 +2,7 @@ import { Bell, FileText, GraduationCap, LayoutGrid, LogOut } from "lucide-react"
 import { Link, NavLink } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext.jsx";
-import useAmbilData from "../../hooks/useAmbilData.js";
+import { useEffect, useState } from "react";
 import { ambilProfil } from "../../services/pengajuanMahasiswaService.js";
 // Gaya bar atas diambil dari halaman Layanan milik AK supaya tampilannya sama persis.
 import "../../pages/dashboard/DashboardMahasiswa.css";
@@ -15,12 +15,27 @@ const MENU = [
   { label: "Notifikasi", to: "/notifikasi", Ikon: Bell }
 ];
 
+// Profil disimpan per akun, jadi waktu pindah halaman header nggak kedip (nggak ambil ulang)
+let profilTersimpan = { idAkun: null, data: null };
+
 export default function HeaderMahasiswa() {
   const { user, logout } = useAuth();
 
   // Nama dan prodi dari GET /api/pengajuan/profil. Selama belum tiba (atau gagal),
   // dipakai email akun yang login supaya tidak pernah menampilkan orang lain.
-  const { data: profil } = useAmbilData(() => ambilProfil(), []);
+  const cocok = profilTersimpan.idAkun === user?.idAkun;
+  const [profil, setProfil] = useState(cocok ? profilTersimpan.data : null);
+
+  useEffect(() => {
+    if (cocok) return;
+    ambilProfil()
+      .then((data) => {
+        profilTersimpan = { idAkun: user?.idAkun, data };
+        setProfil(data);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.idAkun]);
   const kata = (profil?.namaMahasiswa ?? "").split(" ").filter(Boolean);
   const nama = kata.length ? kata.slice(0, 2).join(" ") : (user?.email ?? "");
   const inisial = (kata.length ? kata.slice(0, 2).map((k) => k[0]).join("") : (user?.email ?? "")[0] ?? "").toUpperCase();

@@ -5,7 +5,7 @@ import { ambilTautanBerkas } from "../../services/pengajuanService.js";
 // Tombol "Lihat": ambil tautan sementara dari backend, buka di tab baru
 // Tab dibuka duluan biar tidak diblokir pop-up blocker
 // Dibungkus satu kolom supaya error tidak menghimpit nama berkas
-export default function TombolLihatBerkas({ idPengajuan, idDokumenPengajuan }) {
+export default function TombolLihatBerkas({ idPengajuan, idDokumenPengajuan, ambilTautan = ambilTautanBerkas, kelas = "berkas__lihat" }) {
   const [memuat, setMemuat] = useState(false);
   const [pesan, setPesan] = useState("");
 
@@ -14,7 +14,7 @@ export default function TombolLihatBerkas({ idPengajuan, idDokumenPengajuan }) {
     setMemuat(true);
     const tab = window.open("", "_blank");
     try {
-      const url = await ambilTautanBerkas(idPengajuan, idDokumenPengajuan);
+      const url = await ambilTautan(idPengajuan, idDokumenPengajuan);
       if (tab) {
         tab.opener = null;
         tab.location.href = url;
@@ -31,7 +31,7 @@ export default function TombolLihatBerkas({ idPengajuan, idDokumenPengajuan }) {
 
   return (
     <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flex: "0 0 auto" }}>
-      <button type="button" className="berkas__lihat" onClick={lihat} disabled={memuat}>
+      <button type="button" className={kelas} onClick={lihat} disabled={memuat}>
         {memuat ? "Membuka..." : "Lihat"}
       </button>
       {pesan && (
