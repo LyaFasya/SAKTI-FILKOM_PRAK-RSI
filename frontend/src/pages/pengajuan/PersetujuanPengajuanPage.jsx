@@ -69,7 +69,7 @@ export default function PersetujuanPengajuanPage() {
       return;
     }
     if (!berkas) {
-      setPesanForm("Unggah dokumen hasil terlebih dahulu.");
+      setPesanForm("Pilih dokumen hasil terlebih dahulu.");
       return;
     }
     setPesanPopup("");
@@ -91,7 +91,7 @@ export default function PersetujuanPengajuanPage() {
 
   return (
     <>
-      <PageHeader judul="Persetujuan pengajuan" deskripsi="Unggah dokumen hasil, lalu tinjau kembali sebelum mengonfirmasi." />
+      <PageHeader judul="Persetujuan pengajuan" deskripsi="Pilih dokumen hasil, lalu tinjau kembali sebelum mengonfirmasi." />
 
       <div className="detail-grid">
         <section className="detail-kartu" aria-label="Dokumen hasil">
@@ -111,7 +111,7 @@ export default function PersetujuanPengajuanPage() {
               <input
                 type="file"
                 accept="application/pdf,.pdf"
-                aria-label="Unggah dokumen hasil"
+                aria-label="Pilih dokumen hasil"
                 onChange={pilihBerkas}
               />
             </div>
@@ -135,7 +135,7 @@ export default function PersetujuanPengajuanPage() {
             Pastikan dokumen wajib sudah diunggah dan diverifikasi <strong>Sesuai</strong>.
           </p>
           <div className="staf-infobox">
-            <p>Mengunggah dokumen hasil belum mengubah status pengajuan. Keputusan disimpan setelah konfirmasi.</p>
+            <p>Setelah konfirmasi, sistem mengunggah dokumen hasil dan menyimpan keputusan.</p>
           </div>
         </section>
       </div>

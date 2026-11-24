@@ -18,7 +18,6 @@ const FILTER_AWAL = { kataKunci: "", status: "", idLayanan: "" };
 const MAKS_BARIS_DASHBOARD = 5;
 
 // DSB-UI01 | DSB-UC01 Ringkasan, DSB-UC02 Daftar, DSB-UC03 Cari dan Filter
-// Asumsi: kartu status hitung SEMUA pengajuan, cari/filter cuma pengaruh ke bar & tabel (cocokkan dengan tim)
 export default function DashboardPage() {
   const [kataKunciInput, setKataKunciInput] = useState("");
   const [filter, setFilter] = useState(FILTER_AWAL);
@@ -32,7 +31,7 @@ export default function DashboardPage() {
 
   function cari(event) {
     event.preventDefault();
-    setFilter((lama) => ({ ...lama, kataKunci: kataKunciInput }));
+    setFilter((lama) => ({ ...lama, kataKunci: kataKunciInput.trim() }));
   }
 
   function reset() {
@@ -42,6 +41,11 @@ export default function DashboardPage() {
 
   const hasil = daftar.data ?? [];
   const layanan = opsiLayanan.data ?? [];
+  const filterDaftar = new URLSearchParams();
+  if (filter.kataKunci) filterDaftar.set("q", filter.kataKunci);
+  if (filter.status) filterDaftar.set("status", filter.status);
+  if (filter.idLayanan) filterDaftar.set("layanan", filter.idLayanan);
+  const queryDaftar = filterDaftar.toString();
   // Bar cuma untuk layanan yang punya pengajuan
   const layananTampil = layanan
     .map((l) => ({
@@ -61,7 +65,7 @@ export default function DashboardPage() {
 
       {ringkasan.error && <p className="pesan pesan--error" role="alert">{ringkasan.error}</p>}
 
-      <section className="dash-stat" aria-label="Jumlah pengajuan per status">
+      <section className="dash-stat" aria-label="Jumlah seluruh pengajuan per status">
         {DAFTAR_STATUS.map((status) => (
           <div className="dash-stat__kartu" key={status}>
             <StatusBadge status={status} />
@@ -150,7 +154,10 @@ export default function DashboardPage() {
       <section className="staf-panel" aria-labelledby="judul-daftar">
         <div className="staf-panel__kepala">
           <h2 id="judul-daftar">Daftar pengajuan</h2>
-          <Link to="/staf/pengajuan" className="staf-link">
+          <Link
+            to={{ pathname: "/staf/pengajuan", search: queryDaftar }}
+            className="staf-link"
+          >
             Lihat semua <IkonPanah ukuran={14} />
           </Link>
         </div>

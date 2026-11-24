@@ -54,7 +54,10 @@ export default function DetailPengajuanPage() {
               <span className="berkas__ikon">FILE</span>
               <div className="berkas__info">
                 <div className="berkas__nama">{l.namaFile}</div>
-                <div className="berkas__jenis">{l.jenisDokumen}</div>
+                <div className="berkas__jenis">
+                  {l.jenisDokumen}
+                  {l.formatFile && ` · Format ${l.formatFile}`}
+                </div>
               </div>
               <HasilBadge hasil={l.hasilVerifikasi} />
               <TombolLihatBerkas idPengajuan={d.idPengajuan} idDokumenPengajuan={l.idDokumen} />

@@ -56,6 +56,7 @@ function ubahDetailBackend(d) {
       idDokumen: l.idDokumenPengajuan,
       jenisDokumen: l.namaDokumen,
       namaFile: l.namaFile,
+      formatFile: l.formatFile,
       hasilVerifikasi: l.statusDokumen ?? HASIL_VERIFIKASI.BELUM
     })),
     keputusan: d.waktuKeputusan
