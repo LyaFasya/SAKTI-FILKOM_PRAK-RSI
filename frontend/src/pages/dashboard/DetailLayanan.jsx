@@ -1,202 +1,326 @@
-
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ambilDaftarLayanan } from "../../services/layananService.js";
-
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { ambilDetailLayanan } from "../../services/layananService.js";
 import HeaderMahasiswa from "../../components/mahasiswa/HeaderMahasiswa.jsx";
+import { ASET } from "../../config/aset.js";
 import "./DetailLayanan.css";
 
-import { ASET } from "../../config/aset.js";
-const logoFilkom = ASET.logoFilkomUb;
+function KartuLampiran({ dokumen, bersyarat }) {
+  const ukuran =
+    dokumen.maksimalUkuranEfektifMb ?? dokumen.maksimalUkuranMb;
 
-const identityFields = [
-  ["Nama Pengaju", "Wajib · Isian"],
-  ["NIM Pengaju", "Wajib · Isian"],
-  ["Asal Prodi", "Wajib · Pilihan"],
-  ["No. HP", "Wajib · Isian"],
-  ["Email", "Wajib · Email"],
-];
+  const ketentuan = [
+    dokumen.format,
+    dokumen.maksimalFile ? `${dokumen.maksimalFile} file` : null,
+    ukuran ? `maksimal ${ukuran} MB per file` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
-const activityFields = [
-  ["Nama Kegiatan/Lomba", "Wajib · Isian"],
-  ["Lokasi Kegiatan/Lomba", "Wajib · Isian"],
-  ["Sebagai", "Wajib · Pilihan"],
-  ["Other response (sesuai pilihan)", "Wajib · Isian"],
-  ["Tanggal Awal Pelaksanaan Kegiatan", "Wajib · Tanggal"],
-  ["Tanggal Akhir Pelaksanaan Kegiatan", "Wajib · Tanggal"],
-];
-
-function FieldGroup({ title, description, fields }) {
-  return (
-    <section className="dl-field-group">
-      <div className="dl-group-heading">
-        <span className="dl-chevron">▾</span>
-        <div>
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-      </div>
-
-      <div className="dl-field-list">
-        {fields.map(([name, type]) => (
-          <div className="dl-field-row" key={name}>
-            <span>{name}</span>
-            <strong>{type}</strong>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function UploadRequirement({ title, format, description, status }) {
   return (
     <div className="dl-upload-box">
       <div className="dl-upload-content">
-        <h4>{title}</h4>
-        <span className="dl-upload-format">{format}</span>
-        <p>{description}</p>
+        <h4>{dokumen.namaDokumen}</h4>
+
+        <span className="dl-upload-format">
+          {ketentuan ||
+            dokumen.ketentuanUnggahan ||
+            "Ketentuan berkas belum tersedia."}
+        </span>
+
+        {dokumen.petunjukUnggahan && (
+          <p>{dokumen.petunjukUnggahan}</p>
+        )}
       </div>
-      <span className="dl-upload-status">{status}</span>
+
+      <span className="dl-upload-status">
+        {dokumen.wajib ? "Wajib" : "Opsional"}
+        {bersyarat ? " sesuai pilihan" : ""}
+      </span>
     </div>
   );
 }
 
+function KelompokFormulir({ kelompok }) {
+  const isian = kelompok.isian ?? [];
+  const lampiran = kelompok.lampiran ?? [];
+
+  return (
+    <section className="dl-field-group">
+      <div className="dl-group-heading">
+        <span className="dl-chevron" aria-hidden="true">
+          ▾
+        </span>
+
+        <div>
+          <h3>{kelompok.judul}</h3>
+          <p>
+            {isian.length} isian · {lampiran.length} lampiran
+            {kelompok.bersyarat
+              ? " · Sesuai pilihan pada formulir"
+              : ""}
+          </p>
+        </div>
+      </div>
+
+      <div className="dl-field-list">
+        {isian.map((item, index) => (
+          <div
+            className="dl-field-row"
+            key={`${item.label}-${index}`}
+          >
+            <span>{item.labelTampilan ?? item.label}</span>
+
+            <strong>
+              {item.wajib ? "Wajib" : "Opsional"} ·{" "}
+              {item.tipe ?? "Isian"}
+              {item.bersyarat || kelompok.bersyarat
+                ? " · Sesuai pilihan"
+                : ""}
+            </strong>
+          </div>
+        ))}
+      </div>
+
+      {lampiran.length > 0 && (
+        <div className="dl-upload-list">
+          {lampiran.map((dokumen) => (
+            <KartuLampiran
+              key={dokumen.idDokumen}
+              dokumen={dokumen}
+              bersyarat={kelompok.bersyarat}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function DetailLayanan() {
+  const { idLayanan } = useParams();
   const navigate = useNavigate();
 
-const isiFormulir = async () => {
-  try {
-    const daftar = await ambilDaftarLayanan();
+  const [percobaan, setPercobaan] = useState(0);
+  const [hasil, setHasil] = useState({
+    id: null,
+    data: null,
+    memuat: true,
+    error: "",
+    status: null,
+  });
 
-    const layanan = daftar.find(
-      (l) => l.namaLayanan === "Dispensasi lomba atau kegiatan"
-    );
+  useEffect(() => {
+    let aktif = true;
 
-    if (layanan) {
-      navigate(`/layanan/${layanan.idLayanan}/ajukan`);
-    } else {
-      alert("Layanan dispensasi tidak ditemukan.");
+    setHasil({
+      id: idLayanan,
+      data: null,
+      memuat: true,
+      error: "",
+      status: null,
+    });
+
+    async function muatDetail() {
+      try {
+        if (!/^[1-9]\d*$/.test(idLayanan ?? "")) {
+          setHasil({
+            id: idLayanan,
+            data: null,
+            memuat: false,
+            error: "ID layanan tidak valid.",
+            status: 400,
+          });
+          return;
+        }
+
+        // Respons detail sudah memuat persyaratan dan rincian formulir.
+        const data = await ambilDetailLayanan(idLayanan);
+
+        if (aktif) {
+          setHasil({
+            id: idLayanan,
+            data,
+            memuat: false,
+            error: "",
+            status: null,
+          });
+        }
+      } catch (error) {
+        if (aktif) {
+          setHasil({
+            id: idLayanan,
+            data: null,
+            memuat: false,
+            error: error.message || "Gagal memuat detail layanan.",
+            status: error.status,
+          });
+        }
+      }
     }
-  } catch (error) {
-    console.error("Gagal mengambil daftar layanan:", error);
-    alert("Gagal membuka formulir. Silakan coba lagi.");
-  }
-};
+
+    muatDetail();
+
+    return () => {
+      aktif = false;
+    };
+  }, [idLayanan, percobaan]);
+
+  const memuat = hasil.memuat || hasil.id !== idLayanan;
+  const layanan = memuat ? null : hasil.data;
+  const persyaratan = layanan?.persyaratan ?? [];
+  const rincian = layanan?.rincianFormulir ?? [];
+  const menerimaPengajuan = layanan?.menerimaPengajuan === true;
+
   return (
     <div className="detail-layanan-page">
-      {/* NAVBAR */}
       <HeaderMahasiswa />
 
-      {/* MAIN CONTENT */}
       <main className="dl-container">
         <div className="dl-breadcrumb">
           Portal Mahasiswa / Detail Layanan
         </div>
 
-        <section className="dl-page-heading">
-          <h1>Dispensasi lomba atau kegiatan</h1>
-          <p>Informasi dan kelengkapan layanan yang kamu pilih.</p>
-        </section>
-
-        <div className="dl-content-grid">
-          {/* LEFT: INFORMATION CARD */}
+        {memuat ? (
+          <p className="dl-description" role="status">
+            Memuat detail layanan...
+          </p>
+        ) : hasil.error || !layanan ? (
           <section className="dl-information-card">
-            <span className="dl-category">KEGIATAN</span>
+            <h1>
+              {hasil.status === 404
+                ? "Layanan tidak ditemukan"
+                : "Detail layanan tidak tersedia"}
+            </h1>
 
-            <h2 className="dl-information-title">Informasi layanan</h2>
-
-            <p className="dl-description">
-              Permohonan dispensasi untuk keikutsertaan mahasiswa dalam
-              lomba atau kegiatan kemahasiswaan.
+            <p role="alert">
+              {hasil.error || "Data layanan belum tersedia."}
             </p>
 
-            <h3 className="dl-form-title" id="rincian-formulir">
-              Rincian formulir
-            </h3>
+            {hasil.status !== 400 && hasil.status !== 404 && (
+              <button
+                type="button"
+                className="dl-fill-button"
+                onClick={() => setPercobaan((nilai) => nilai + 1)}
+              >
+                Coba lagi
+              </button>
+            )}
 
-            <FieldGroup
-              title="Identitas dan kontak"
-              description="5 isian · 0 lampiran"
-              fields={identityFields}
-            />
-
-            <FieldGroup
-              title="Detil kegiatan / lomba"
-              description="6 isian · 2 lampiran"
-              fields={activityFields}
-            />
-
-            <div className="dl-upload-list">
-              <UploadRequirement
-                title="Unggah Data Lampiran"
-                format="Spreadsheet (Excel) · 1 file · maksimal 1 MB per file"
-                description="Daftar nama anggota dan mata kuliah yang diajukan dispensasi. Gunakan format MS Excel / spreadsheet."
-                status="Wajib"
-              />
-
-              <UploadRequirement
-                title="Unggah Data Pendukung"
-                format="PDF · 1 file · maksimal 10 MB per file"
-                description="Bukti pendukung berupa undangan / surat tugas / dokumen lain."
-                status="Opsional"
-              />
-            </div>
-
-            <div className="dl-card-bottom-line" />
-          </section>
-
-          {/* RIGHT: CALL TO ACTION */}
-          <aside className="dl-action-card">
-            <div className="dl-action-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M12 2.5 13.7 8l5.3 1.7-5.3 1.7-1.7 5.3-1.7-5.3L5 9.7 10.3 8 12 2.5Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            <h2>Siap mengisi?</h2>
             <p>
-              Isi sesuai kebutuhanmu dan periksa ketentuan pada setiap
-              lampiran.
+              <Link to="/layanan">Kembali ke daftar layanan</Link>
             </p>
+          </section>
+        ) : (
+          <>
+            <section className="dl-page-heading">
+              <h1>{layanan.namaLayanan}</h1>
+              <p>
+                Informasi dan kelengkapan layanan yang kamu pilih.
+              </p>
+            </section>
 
-            <button
-              type="button"
-              className="dl-fill-button"
-              onClick={isiFormulir}
-            >
-              Isi Formulir
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                  d="M3.5 10h12m-5-5 5 5-5 5"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </aside>
-        </div>
+            <div className="dl-content-grid">
+              <section className="dl-information-card">
+                <span className="dl-category">
+                  {layanan.kategoriLayanan}
+                </span>
+
+                <h2 className="dl-information-title">
+                  Informasi layanan
+                </h2>
+
+                <p
+                  className="dl-description"
+                  style={{ whiteSpace: "pre-line" }}
+                >
+                  {layanan.informasiLayanan}
+                </p>
+
+                {layanan.catatan && (
+                  <p className="dl-description">
+                    {layanan.catatan}
+                  </p>
+                )}
+
+                <h3 className="dl-form-title">
+                  Persyaratan umum
+                </h3>
+
+                {persyaratan.length > 0 ? (
+                  <ul className="dl-description">
+                    {persyaratan.map((item) => (
+                      <li key={item.idPersyaratan}>
+                        {item.deskripsiPersyaratan}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="dl-description">
+                    Persyaratan umum belum tersedia.
+                  </p>
+                )}
+
+                <h3 className="dl-form-title">
+                  Rincian formulir dan lampiran
+                </h3>
+
+                {rincian.length > 0 ? (
+                  rincian.map((kelompok) => (
+                    <KelompokFormulir
+                      key={kelompok.judul}
+                      kelompok={kelompok}
+                    />
+                  ))
+                ) : (
+                  <p className="dl-description">
+                    Rincian formulir belum tersedia untuk layanan ini.
+                  </p>
+                )}
+
+                <div className="dl-card-bottom-line" />
+              </section>
+
+              <aside className="dl-action-card">
+                <h2>
+                  {menerimaPengajuan
+                    ? "Siap mengisi?"
+                    : "Pengajuan belum tersedia"}
+                </h2>
+
+                <p>
+                  {menerimaPengajuan
+                    ? "Lengkapi formulir sesuai layanan dan periksa ketentuan setiap lampiran."
+                    : layanan.catatan ||
+                      "Layanan ini belum menerima pengajuan melalui formulir."}
+                </p>
+
+                {menerimaPengajuan && (
+                  <button
+                    type="button"
+                    className="dl-fill-button"
+                    onClick={() =>
+                      navigate(`/layanan/${idLayanan}/ajukan`)
+                    }
+                  >
+                    Isi Formulir
+                  </button>
+                )}
+              </aside>
+            </div>
+          </>
+        )}
       </main>
 
-      {/* FOOTER */}
       <footer className="dl-footer">
         <div className="dl-footer-brand">
           <span>PORTAL RESMI</span>
-          <img src={logoFilkom} alt="Logo FILKOM Universitas Brawijaya" />
+          <img
+            src={ASET.logoFilkomUb}
+            alt="Logo FILKOM Universitas Brawijaya"
+          />
         </div>
+
         <p>© 2026 SAKTI FILKOM · Universitas Brawijaya</p>
       </footer>
     </div>
