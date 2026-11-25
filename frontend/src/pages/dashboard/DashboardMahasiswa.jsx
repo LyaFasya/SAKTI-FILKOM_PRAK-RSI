@@ -1,5 +1,7 @@
 ﻿
-import React, { useEffect, useState } from "react";import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import LayananTidakTersedia from "./LayananTidakTersedia.jsx";
 import { ambilDaftarLayanan } from "../../services/layananService.js";
 import { ambilPengajuanSaya } from "../../services/pengajuanMahasiswaService.js";
 import { formatIdPengajuan, formatTanggalPendek } from "../../utils/formatPengajuan.js";
@@ -130,8 +132,17 @@ const KELAS_STATUS = {
 
 export default function DashboardMahasiswa() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const kataKunci = (searchParams.get("search") || "").trim();
+  const categoryParam = searchParams.get("category");
+  const selectedCategory = SERVICE_CATEGORIES.some((cat) => cat.id === categoryParam)
+    ? categoryParam
+    : "all";
+  const kategoriLayanan = SERVICE_CATEGORIES.find((cat) => cat.id === selectedCategory)?.title || "";
+  const [searchQuery, setSearchQuery] = useState(kataKunci);
+  const [loadingLayanan, setLoadingLayanan] = useState(true);
+  const [errorLayanan, setErrorLayanan] = useState("");
+  const [percobaanMuat, setPercobaanMuat] = useState(0);
   const [daftarLayanan, setDaftarLayanan] = useState([]);
   const [pengajuanTerakhir, setPengajuanTerakhir] = useState([]);
 
@@ -142,19 +153,28 @@ export default function DashboardMahasiswa() {
   }, []);
 
   useEffect(() => {
-    const muatLayanan = async () => {
-      try {
-        const data = await ambilDaftarLayanan();
-        setDaftarLayanan(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Gagal memuat daftar layanan:", error);
-      }
-    };
+    setSearchQuery(kataKunci);
+  }, [kataKunci]);
 
-    muatLayanan();
-  }, []);
+  useEffect(() => {
+    let aktif = true;
+    setLoadingLayanan(true);
+    setErrorLayanan("");
+    setDaftarLayanan([]);
 
-  const normalizedQuery = searchQuery.trim().toLowerCase();
+    ambilDaftarLayanan({ kataKunci, kategoriLayanan })
+      .then((data) => {
+        if (aktif) setDaftarLayanan(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (aktif) setErrorLayanan("Daftar layanan gagal dimuat. Silakan coba lagi.");
+      })
+      .finally(() => {
+        if (aktif) setLoadingLayanan(false);
+      });
+
+    return () => { aktif = false; };
+  }, [kataKunci, kategoriLayanan, percobaanMuat]);
 
   const filteredCategories = SERVICE_CATEGORIES
     .filter((cat) => {
@@ -175,56 +195,27 @@ export default function DashboardMahasiswa() {
           };
         });
 
-      const categoryMatches =
-        normalizedQuery &&
-        cat.title.toLowerCase().includes(normalizedQuery);
-
-      const filteredItems =
-        !normalizedQuery || categoryMatches
-          ? layananKategori
-          : layananKategori.filter((item) =>
-              item.name.toLowerCase().includes(normalizedQuery)
-            );
-
       return {
         ...cat,
-        items: filteredItems,
+        items: layananKategori,
       };
     })
     .filter((cat) => cat.items.length > 0);
+  const terapkanPencarian = (query, category) => {
+    const params = {};
+    if (query.trim()) params.search = query.trim();
+    if (category !== "all") params.category = category;
+    setSearchParams(params);
+    setPercobaanMuat((nilai) => nilai + 1);
+  };
+
   const handleSearch = () => {
-    const query = searchQuery.trim().toLowerCase();
-
-    if (!query) return;
-
-    const hasMatch = daftarLayanan.some((layanan) => {
-      const kategori = SERVICE_CATEGORIES.find(
-        (cat) => cat.title === layanan.kategoriLayanan
-      );
-
-      if (
-        selectedCategory !== "all" &&
-        kategori?.id !== selectedCategory
-      ) {
-        return false;
-      }
-
-      return (
-        layanan.namaLayanan.toLowerCase().includes(query) ||
-        layanan.kategoriLayanan.toLowerCase().includes(query)
-      );
-    });
-
-    if (!hasMatch) {
-      navigate(
-        `/layanan?search=${encodeURIComponent(searchQuery.trim())}`
-      );
-    }
+    terapkanPencarian(searchQuery, selectedCategory);
   };
 
   const handleReset = () => {
     setSearchQuery("");
-    setSelectedCategory("all");
+    terapkanPencarian("", "all");
   };
 
   const handleServiceClick = (item) => {
@@ -234,7 +225,7 @@ export default function DashboardMahasiswa() {
   };
 
   return (
-    <div className="dash-page">
+    <div className="dash-page layanan-unavailable-page">
       {/* TOP NAVBAR */}
       <HeaderMahasiswa />
 
@@ -296,7 +287,7 @@ export default function DashboardMahasiswa() {
 
                   <select
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    onChange={(e) => terapkanPencarian(kataKunci, e.target.value)}
                     className="category-select"
                   >
                     <option value="all">Semua kategori</option>
@@ -326,6 +317,18 @@ export default function DashboardMahasiswa() {
             </div>
 
             {/* DIRECTORY CARDS */}
+            {loadingLayanan ? (
+              <p role="status">Memuat layanan...</p>
+            ) : errorLayanan ? (
+              <div role="alert">
+                <p>{errorLayanan}</p>
+                <button type="button" className="lu-show-all-btn" onClick={() => setPercobaanMuat((nilai) => nilai + 1)}>
+                  Coba lagi
+                </button>
+              </div>
+            ) : filteredCategories.length === 0 ? (
+              <LayananTidakTersedia searchedService={kataKunci} onReset={handleReset} />
+            ) : (
             <div className="directory-grid">
               {filteredCategories.map((cat) => (
                 <div key={cat.id} className="service-card">
@@ -373,6 +376,7 @@ export default function DashboardMahasiswa() {
                 </div>
               ))}
             </div>
+            )}
           </div>
 
           {/* SIDEBAR KANAN */}
