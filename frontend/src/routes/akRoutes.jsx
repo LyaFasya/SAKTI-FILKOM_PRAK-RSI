@@ -37,6 +37,10 @@ export const routeGroup = {
       path: "/layanan/dispensasi",
       element: <DetailLayanan />,
     },
+    {
+      path: "/layanan/:idLayanan",
+      element: <DetailLayanan />,
+    },
   ],
 };
 

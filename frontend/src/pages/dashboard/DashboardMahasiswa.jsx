@@ -230,7 +230,7 @@ export default function DashboardMahasiswa() {
   const handleServiceClick = (item) => {
     if (!item.idLayanan) return;
 
-    navigate(`/layanan/${item.idLayanan}/ajukan`);
+    navigate(`/layanan/${item.idLayanan}`);
   };
 
   return (
