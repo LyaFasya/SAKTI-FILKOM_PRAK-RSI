@@ -49,9 +49,37 @@ export default function EditPersyaratanLayananPage() {
 
   const [memuat, setMemuat] = useState(true);
   const [menyimpan, setMenyimpan] = useState(false);
+  const [idDataTermuat, setIdDataTermuat] = useState(null);
+  const [errorPemuatan, setErrorPemuatan] = useState("");
+  const [percobaanMuat, setPercobaanMuat] = useState(0);
+  const dataSiap = idDataTermuat === idLayanan;
+  const formTerkunci = memuat || menyimpan || !dataSiap;
 
   const [pesanError, setPesanError] = useState("");
   const [pesanSukses, setPesanSukses] = useState("");
+
+  function terapkanData(data) {
+    setNamaLayanan(
+      data?.namaLayanan || data?.nama || "Layanan"
+    );
+
+    setPersyaratanUmum(ambilTeksPersyaratan(data));
+
+    const daftarDokumen = Array.isArray(
+      data?.dokumenPersyaratan
+    )
+      ? data.dokumenPersyaratan
+      : [];
+
+    setDokumen(
+      daftarDokumen.map((item) => ({
+        idDokumen: item.idDokumen ?? item.id ?? null,
+        namaDokumen: item.namaDokumen ?? "",
+        petunjukUnggahan: item.petunjukUnggahan ?? "",
+        wajib: Boolean(item.wajib),
+      }))
+    );
+  }
 
   useEffect(() => {
     let masihAktif = true;
@@ -59,36 +87,21 @@ export default function EditPersyaratanLayananPage() {
     async function muatData() {
       try {
         setMemuat(true);
+        setIdDataTermuat(null);
+        setErrorPemuatan("");
         setPesanError("");
+        setPesanSukses("");
 
         const data = await ambilPersyaratanLayanan(idLayanan);
 
         if (!masihAktif) return;
 
-        setNamaLayanan(
-          data?.namaLayanan || data?.nama || "Layanan"
-        );
-
-        setPersyaratanUmum(ambilTeksPersyaratan(data));
-
-        const daftarDokumen = Array.isArray(
-          data?.dokumenPersyaratan
-        )
-          ? data.dokumenPersyaratan
-          : [];
-
-        setDokumen(
-          daftarDokumen.map((item) => ({
-            idDokumen: item.idDokumen ?? item.id ?? null,
-            namaDokumen: item.namaDokumen ?? "",
-            petunjukUnggahan: item.petunjukUnggahan ?? "",
-            wajib: Boolean(item.wajib),
-          }))
-        );
+        terapkanData(data);
+        setIdDataTermuat(idLayanan);
       } catch (error) {
         if (!masihAktif) return;
 
-        setPesanError(
+        setErrorPemuatan(
           error.message || "Gagal memuat persyaratan layanan."
         );
       } finally {
@@ -103,7 +116,7 @@ export default function EditPersyaratanLayananPage() {
     return () => {
       masihAktif = false;
     };
-  }, [idLayanan]);
+  }, [idLayanan, percobaanMuat]);
 
   function ubahDokumen(index, field, value) {
     setDokumen((sebelumnya) =>
@@ -136,6 +149,7 @@ export default function EditPersyaratanLayananPage() {
 
   async function handleSimpan(event) {
     event.preventDefault();
+    if (formTerkunci) return;
 
     setPesanError("");
     setPesanSukses("");
@@ -197,9 +211,19 @@ export default function EditPersyaratanLayananPage() {
         dokumenPersyaratan,
       });
 
-      setPesanSukses(
-        "Persyaratan layanan berhasil diperbarui."
-      );
+      // PATCH hanya mengembalikan ringkasan perubahan, bukan ID dokumen baru.
+      // Ambil ulang data sebelum mengizinkan penyimpanan berikutnya.
+      setIdDataTermuat(null);
+      try {
+        const dataTerbaru = await ambilPersyaratanLayanan(idLayanan);
+        terapkanData(dataTerbaru);
+        setIdDataTermuat(idLayanan);
+        setPesanSukses("Persyaratan layanan berhasil diperbarui.");
+      } catch {
+        setErrorPemuatan(
+          "Perubahan sudah disimpan, tetapi data terbaru gagal dimuat. Klik Coba lagi sebelum menyimpan kembali."
+        );
+      }
     } catch (error) {
       setPesanError(
         error.message ||
@@ -233,6 +257,20 @@ export default function EditPersyaratanLayananPage() {
         </p>
       </header>
 
+      {errorPemuatan && (
+        <div className="edit-persyaratan__alert edit-persyaratan__alert--error" role="alert">
+          <p>{errorPemuatan}</p>
+          <button
+            type="button"
+            className="edit-persyaratan__cancel"
+            disabled={menyimpan}
+            onClick={() => setPercobaanMuat((nilai) => nilai + 1)}
+          >
+            Coba lagi
+          </button>
+        </div>
+      )}
+
       {pesanError && (
         <div className="edit-persyaratan__alert edit-persyaratan__alert--error">
           {pesanError}
@@ -255,6 +293,7 @@ export default function EditPersyaratanLayananPage() {
           </label>
 
           <textarea
+            disabled={formTerkunci}
             id="persyaratanUmum"
             value={persyaratanUmum}
             onChange={(event) => {
@@ -284,6 +323,7 @@ export default function EditPersyaratanLayananPage() {
                     </label>
 
                     <input
+                      disabled={formTerkunci}
                       id={`namaDokumen-${index}`}
                       type="text"
                       value={item.namaDokumen}
@@ -305,6 +345,7 @@ export default function EditPersyaratanLayananPage() {
                     </label>
 
                     <input
+                      disabled={formTerkunci}
                       id={`petunjuk-${index}`}
                       type="text"
                       value={item.petunjukUnggahan}
@@ -323,6 +364,7 @@ export default function EditPersyaratanLayananPage() {
                 <div className="edit-persyaratan__document-controls">
                   <label className="edit-persyaratan__checkbox">
                     <input
+                      disabled={formTerkunci}
                       type="checkbox"
                       checked={item.wajib}
                       onChange={(event) =>
@@ -340,7 +382,7 @@ export default function EditPersyaratanLayananPage() {
                     type="button"
                     className="edit-persyaratan__delete"
                     onClick={() => hapusDokumen(index)}
-                    disabled={menyimpan}
+                    disabled={formTerkunci}
                   >
                     Hapus
                   </button>
@@ -353,7 +395,7 @@ export default function EditPersyaratanLayananPage() {
             type="button"
             className="edit-persyaratan__add"
             onClick={tambahDokumen}
-            disabled={menyimpan}
+            disabled={formTerkunci}
           >
             <span>＋</span>
             Tambah dokumen
@@ -364,7 +406,7 @@ export default function EditPersyaratanLayananPage() {
           <button
             type="submit"
             className="edit-persyaratan__save"
-            disabled={menyimpan}
+            disabled={formTerkunci}
           >
             {menyimpan ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
